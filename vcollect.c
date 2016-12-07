@@ -56,7 +56,7 @@ PHP_FUNCTION(vcollect)
 	zval *var_array;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &var_array) == FAILURE) {
-		RETURN_NULL;
+		RETURN_NULL();
 	}
 
 	RETURN_ZVAL(var_array, 1, 0);
