@@ -7,9 +7,9 @@ dnl without editing.
 
 dnl If your extension references something external, use with:
 
-dnl PHP_ARG_WITH(vcollect, for vcollect support,
+ PHP_ARG_WITH(vcollect, for vcollect support,
 dnl Make sure that the comment is aligned:
-dnl [  --with-vcollect             Include vcollect support])
+ [  --with-vcollect             Include vcollect support])
 
 dnl Otherwise use enable:
 
