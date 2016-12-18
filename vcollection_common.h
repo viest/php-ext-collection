@@ -8,38 +8,26 @@
 
 /**********************************************************\
  *                                                        *
- * php_vcollect.h                                         *
+ * vcollection_common.h                                   *
  *                                                        *
  *                                                        *
- * LastModified: Dec 15, 2016                             *
+ * LastModified: Dec 18, 2016                             *
  * Author: Wang Jiexin <vikindev@outlook.com>             *
  *                                                        *
 \**********************************************************/
 
-#ifndef PHP_VCOLLECT_H
-#define PHP_VCOLLECT_H
+#ifndef VCOLLECTION_COMMON_H
+#define VCOLLECTION_COMMON_H
 
-extern zend_module_entry vcollect_module_entry;
-#define phpext_vcollect_ptr &vcollect_module_entry
+#define ARRAY_COLUMN(arg) ZVAL_STRING(arg, "array_column")
+#define EXPLODE(arg) ZVAL_STRING(arg, "explode")
 
-#define PHP_VCOLLECT_VERSION "0.1.0"
+void __get_array_max (HashTable *htbl, double *retval);
+void __get_array_min (HashTable *htbl, double *retval);
+void __get_collect_pluck (zval *array, zend_string *args ,zval *retval);
 
-#ifdef PHP_WIN32
-#	define PHP_VCOLLECT_API __declspec(dllexport)
-#elif defined(__GNUC__) && __GNUC__ >= 4
-#	define PHP_VCOLLECT_API __attribute__ ((visibility("default")))
-#else
-#	define PHP_VCOLLECT_API
-#endif
-
-#ifdef ZTS
-#include "TSRM.h"
-#endif
-
-#define VCOLLECT_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(vcollect, v)
-
-#if defined(ZTS) && defined(COMPILE_DL_VCOLLECT)
-ZEND_TSRMLS_CACHE_EXTERN()
-#endif
+#define v_array_max(htbl, retval) __get_array_max(htbl, retval)
+#define v_array_mix(htbl, retval) __get_array_min(htbl, retval)
+#define v_collect_pluck(array, args, retval) __get_collect_pluck(array, args, retval)
 
 #endif
