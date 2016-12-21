@@ -623,7 +623,6 @@ ZEND_METHOD(vcollection, where) {
 		zval_ptr_dtor(&explode_retval);
 		zval_ptr_dtor(&exists_retval);
 		zval_ptr_dtor(&column_retval);
-		zval_ptr_dtor(return_value);
 
 		ZVAL_COPY(&result, getThis());
 		RETURN_ZVAL(&result, 0, 0);
