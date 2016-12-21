@@ -41,7 +41,7 @@ $test = vcollect([1, 2, 3, 4, 5, 6]);
 |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |[map](#map)|[collapse](#collapse)|[avg](#avg)|[has](#has)|[mx](#mx)|[mi](#mi)|[toJson](#tojson)|[toArray](#toarray)|[take](#take)|[pluck](#pluck)|
-|||||||||||
+|[where](#where)||||||||||
 
 ******
 
@@ -216,4 +216,17 @@ $vcollect->pluck('developer.name');
 $vcollect->pluck('developer.name', 'id');
 
 //[2=>'Taylor', 5=>'Abigail']
+```
+
+#### where
+快速过滤或筛选集合
+```php
+$vcollect = vcollect([
+    ['developer' => ['name' => 'Taylor'], 'id' => 2],
+    ['developer' => ['name' => 'Abigail'], 'id' => 5]
+]);
+
+$vcollect->where('developer.name', 'Taylor')->toArray();
+
+//[ ['developer' => ['name' => 'Taylor'], 'id' => 2] ]
 ```

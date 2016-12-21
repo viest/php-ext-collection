@@ -51,6 +51,7 @@ PHP_METHOD(vcollection_ce, toArray);
 PHP_METHOD(vcollection_ce, toJson);
 PHP_METHOD(vcollection_ce, take);
 PHP_METHOD(vcollection_ce, pluck);
+PHP_METHOD(vcollection_ce, where);
 PHP_MINIT_FUNCTION(vcollection);
 
 #define VCOLLECTION_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(vcollection, v)

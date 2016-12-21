@@ -24,6 +24,7 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "ext/standard/basic_functions.h"
+#include "ext/standard/php_var.h"
 #include "vcollection_common.h"
 #include "php_vcollection.h"
 
@@ -65,6 +66,12 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(pluck_arg, 0, 0, 0)
 	ZEND_ARG_INFO(0, arg_val)
 	ZEND_ARG_INFO(0, arg_key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(where_arg, 0, 0, 2)
+	ZEND_ARG_INFO(0, arg_key)
+	ZEND_ARG_INFO(0, arg_val)
+	ZEND_ARG_INFO(0, arg_conditional)
 ZEND_END_ARG_INFO()
 
 ZEND_METHOD(vcollection, __construct) {
@@ -514,6 +521,118 @@ ZEND_METHOD(vcollection, pluck) {
 	RETURN_ZVAL(&result_val, 0, 0);
 }
 
+ZEND_METHOD(vcollection, where) {
+	zval *array = NULL;
+	zval *value;
+	zval rv;
+	zend_string *arg_key;
+	zend_string *arg_val = NULL;
+	// zend_string *arg_conditional = NULL;
+	zend_ulong long_key;
+    zend_string *str_key;
+    zval explode_retval;
+    zend_long explode_no = 0;
+    zval exists_retval;
+    zval column_retval;
+    zval result;
+
+#ifdef FAST_ZPP
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "SS|S", &arg_key, &arg_val) == FAILURE) {
+		return;
+	}
+#else
+ 	ZEND_PARSE_PARAMETERS_START(2, 3)
+ 		Z_PARAM_STR(&arg_key)
+ 		Z_PARAM_STR(&arg_val)
+ 		// Z_PARAM_OPTIONAL
+ 		// Z_PARAM_STR(&arg_conditional)
+ 	ZEND_PARSE_PARAMETERS_END();
+#endif
+
+ 	array = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+
+ 	// if(arg_conditional == NULL) {
+ 		array_init(return_value);
+
+ 		v_explode(arg_key, &explode_retval);
+ 		HashTable *explode_htbl = Z_ARRVAL(explode_retval);
+ 		
+ 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), long_key, str_key, value) {
+ 			Bucket *explode_bucket = &explode_htbl->arData[explode_no];
+ 			v_key_exists(&(explode_bucket->val), value, &exists_retval);
+
+ 			if(Z_TYPE(exists_retval) == IS_TRUE) {
+ 				while(1) {
+ 					if(explode_no == 0 && zend_hash_num_elements(explode_htbl) > 1) {
+	 					explode_no++;
+	 					explode_bucket = &explode_htbl->arData[explode_no];
+	 					v_column(value, &(explode_bucket->val), &column_retval);
+	 				} else if(explode_no == 0 && zend_hash_num_elements(explode_htbl) == 1) {
+	 					array_init(&column_retval);
+	 					HashTable *value_htbl = Z_ARRVAL_P(value);
+	 					for (int i = 0; i < zend_hash_num_elements(value_htbl); ++i)
+	 					{
+							zval retval;
+							v_strcmp(value_htbl->arData[i].key, Z_STR(explode_bucket->val), &retval);
+							if( zval_get_long(&retval) == 0) {
+								add_index_zval(&column_retval, zval_get_long(&retval), &(value_htbl->arData[i].val));
+							}
+	 					}
+	 				} else {
+	 					explode_bucket = &explode_htbl->arData[explode_no];
+	 					v_column(&column_retval, &(explode_bucket->val), &column_retval);
+	 				}
+
+	 				HashTable *column_htbl = Z_ARRVAL(column_retval);
+	 				zend_long no_temp = 0;
+
+
+	 				if(zend_hash_num_elements(column_htbl) == 1 && Z_TYPE_P(&column_htbl->arData[no_temp].val) != IS_ARRAY) {
+	 					zval retvala;
+	 					if(Z_TYPE_P(&column_htbl->arData[no_temp].val) == IS_STRING){
+	 						v_strcmp(Z_STR_P(&column_htbl->arData[no_temp].val), arg_val, &retvala);
+	 					} else if (Z_TYPE_P(&column_htbl->arData[no_temp].val) == IS_LONG) {
+	 						zval retvala_long;
+	 						v_intval(arg_val, &retvala_long);
+	 						if(Z_LVAL_P(&column_htbl->arData[no_temp].val) == zval_get_long(&retvala_long)) {
+	 							ZVAL_LONG(&retvala, 0);
+	 						}else{
+	 							ZVAL_LONG(&retvala, 1);
+	 						}
+	 						zval_ptr_dtor(&retvala_long);
+	 					}
+	 					if(zval_get_long(&retvala) == 0) {
+	 						HashTable *arr_htbl = Z_ARRVAL_P(array);
+	 						add_next_index_zval(return_value, &arr_htbl->arData[long_key].val);
+	 					}
+	 					zval_ptr_dtor(&retvala);
+	 					explode_no = 0;
+	 					break;
+	 				}
+	 				explode_no++;
+ 				}
+ 				
+ 			}
+ 			ZVAL_NULL(&exists_retval);
+		} ZEND_HASH_FOREACH_END();
+
+		zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, return_value TSRMLS_CC);
+
+		zval_ptr_dtor(value);
+		zval_ptr_dtor(&rv);
+		zval_ptr_dtor(&explode_retval);
+		zval_ptr_dtor(&exists_retval);
+		zval_ptr_dtor(&column_retval);
+		zval_ptr_dtor(return_value);
+
+		ZVAL_COPY(&result, getThis());
+		RETURN_ZVAL(&result, 0, 0);
+
+ 	// } else {
+ 	// 	RETURN_STR(arg_conditional);
+ 	// }
+}
+
 PHP_MSHUTDOWN_FUNCTION(vcollection)
 {
 	return SUCCESS;
@@ -560,6 +679,7 @@ const zend_function_entry vcollection_functions[] = {
 	ZEND_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, take, take_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, pluck, pluck_arg, ZEND_ACC_PUBLIC)
+	ZEND_ME(vcollection, where, where_arg, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

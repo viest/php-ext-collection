@@ -136,3 +136,112 @@ void __get_collect_pluck(zval *array, zend_string *args, zval *retval) {
     ZVAL_COPY(retval, &column_ret_val);
   }
 }
+
+void __key_exists (zval *key, zval *array, zval *retval) {
+  zval key_exists;
+  zval arg[2];
+
+  ZVAL_COPY(&arg[1], array);
+  ZVAL_COPY(&arg[0], key);
+
+  ZVAL_STRING(&key_exists, "array_key_exists");
+  if (call_user_function(EG(function_table), NULL, &key_exists, retval, 2, arg) == FAILURE) {
+    zval_ptr_dtor(&arg[1]);
+    zval_ptr_dtor(&arg[0]);
+    zval_ptr_dtor(retval);
+    ZVAL_UNDEF(retval);
+  } else if (Z_ISUNDEF_P(retval)) {
+    zval_ptr_dtor(&arg[1]);
+    zval_ptr_dtor(&arg[0]);
+    ZVAL_NULL(retval);
+  }
+  zval_ptr_dtor(&arg[1]);
+  zval_ptr_dtor(&arg[0]);
+}
+
+void __explode (zend_string *str_arg, zval *explode_retval) {
+    zval explode;
+    zval args[2];
+    zval cut;
+    EXPLODE(&explode);
+    ZVAL_STRING(&cut, ".");
+
+    ZVAL_COPY(&args[0], &cut);
+    ZVAL_STR_COPY(&args[1], str_arg);
+
+    if (call_user_function(EG(function_table), NULL, &explode, explode_retval, 2, args) == FAILURE) {
+      zval_ptr_dtor(&args[1]);
+      zval_ptr_dtor(&args[0]);
+      zval_ptr_dtor(explode_retval);
+      ZVAL_UNDEF(explode_retval);
+    } else if (Z_ISUNDEF_P(explode_retval)) {
+      zval_ptr_dtor(&args[1]);
+      zval_ptr_dtor(&args[0]);
+      ZVAL_NULL(explode_retval);
+    }
+    zval_ptr_dtor(&args[1]);
+    zval_ptr_dtor(&args[0]);
+}
+
+void __column (zval *array, zval *str_arg, zval *column_retval) {
+  zval column;
+  zval args[2];
+  ARRAY_COLUMN(&column);
+
+  ZVAL_COPY(&args[0], array);
+  ZVAL_COPY(&args[1], str_arg);
+
+  if (call_user_function(EG(function_table), NULL, &column, column_retval, 2, args) == FAILURE) {
+    zval_ptr_dtor(&args[1]);
+    zval_ptr_dtor(&args[0]);        
+    zval_ptr_dtor(column_retval);
+    ZVAL_UNDEF(column_retval);
+  } else if (Z_ISUNDEF_P(column_retval)) {
+    zval_ptr_dtor(&args[1]);
+    zval_ptr_dtor(&args[0]);
+    ZVAL_NULL(column_retval);
+  }
+  zval_ptr_dtor(&args[1]);
+  zval_ptr_dtor(&args[0]);
+}
+
+void __strcmp (zend_string *op1, zend_string *op2, zval *retval) {
+  zval strcmp;
+  zval arg[2];
+
+  ZVAL_STR_COPY(&arg[1], op1);
+  ZVAL_STR_COPY(&arg[0], op2);
+
+  STRCMP(&strcmp);
+
+  if (call_user_function(EG(function_table), NULL, &strcmp, retval, 2, arg) == FAILURE) {
+    zval_ptr_dtor(&arg[1]);
+    zval_ptr_dtor(&arg[0]);        
+    zval_ptr_dtor(retval);
+    ZVAL_UNDEF(retval);
+  } else if (Z_ISUNDEF_P(retval)) {
+    zval_ptr_dtor(&arg[1]);
+    zval_ptr_dtor(&arg[0]);
+    ZVAL_NULL(retval);
+  }
+  zval_ptr_dtor(&arg[1]);
+  zval_ptr_dtor(&arg[0]);
+}
+
+void __intval (zend_string *op1, zval *retval) {
+  zval intval;
+  zval arg[1];
+  INTVAL(&intval);
+
+  ZVAL_STR_COPY(&arg[0], op1);
+
+  if (call_user_function(EG(function_table), NULL, &intval, retval, 1, arg) == FAILURE) {
+    zval_ptr_dtor(&arg[0]);        
+    zval_ptr_dtor(retval);
+    ZVAL_UNDEF(retval);
+  } else if (Z_ISUNDEF_P(retval)) {
+    zval_ptr_dtor(&arg[0]);
+    ZVAL_NULL(retval);
+  }
+  zval_ptr_dtor(&arg[0]);
+}
