@@ -552,7 +552,7 @@ ZEND_METHOD(vcollection, where) {
  	array = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
 
  	// if(arg_conditional == NULL) {
- 		array_init(return_value);
+ 		array_init(&result);
 
  		v_explode(arg_key, &explode_retval);
  		HashTable *explode_htbl = Z_ARRVAL(explode_retval);
@@ -603,7 +603,7 @@ ZEND_METHOD(vcollection, where) {
 	 					}
 	 					if(zval_get_long(&retvala) == 0) {
 	 						HashTable *arr_htbl = Z_ARRVAL_P(array);
-	 						add_next_index_zval(return_value, &arr_htbl->arData[long_key].val);
+	 						add_next_index_zval(&result, &arr_htbl->arData[long_key].val);
 	 					}
 	 					zval_ptr_dtor(&retvala);
 	 					explode_no = 0;
@@ -616,16 +616,10 @@ ZEND_METHOD(vcollection, where) {
  			ZVAL_NULL(&exists_retval);
 		} ZEND_HASH_FOREACH_END();
 
-		zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, return_value TSRMLS_CC);
+		zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, &result);
 
-		zval_ptr_dtor(value);
-		zval_ptr_dtor(&rv);
-		zval_ptr_dtor(&explode_retval);
-		zval_ptr_dtor(&exists_retval);
-		zval_ptr_dtor(&column_retval);
-
-		ZVAL_COPY(&result, getThis());
-		RETURN_ZVAL(&result, 0, 0);
+		ZVAL_COPY(return_value, getThis());
+		RETURN_ZVAL(return_value, 0, 0);
 
  	// } else {
  	// 	RETURN_STR(arg_conditional);
