@@ -35,7 +35,7 @@ static int le_vcollect;
 PHP_FUNCTION(vcollect)
 {
 	zval *var_array;
-	zval class_name;
+	zval class_name, function_name;
 	zend_class_entry *vcoll_ce;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &var_array) == FAILURE) {
@@ -43,11 +43,16 @@ PHP_FUNCTION(vcollect)
 	}
 
 	ZVAL_STRING(&class_name, CLASS_NAME);
+	ZVAL_STRING(&function_name, "getInstance");
 
+	
 	vcoll_ce = zend_fetch_class(zval_get_string(&class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-
 	object_init_ex(return_value,vcoll_ce);
-	zend_call_method_with_1_params(return_value, vcoll_ce, NULL,"__construct", NULL, var_array);
+
+	// zend_call_method_with_1_params(return_value, vcoll_ce, NULL,"getinstance", return_value, var_array);
+
+	// zval_ptr_dtor(var_array);
+	// php_printf("%s", "vikin");
 }
 
 PHP_MINIT_FUNCTION(vcollect)

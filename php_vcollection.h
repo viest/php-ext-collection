@@ -41,6 +41,7 @@ extern zend_module_entry vcollection_module_entry;
 
 extern zend_class_entry *vcollection_ce;
 PHP_METHOD(vcollection_ce, __construct);
+PHP_METHOD(vcollection_ce, getinstance);
 PHP_METHOD(vcollection_ce, map);
 PHP_METHOD(vcollection_ce, collapse);
 PHP_METHOD(vcollection_ce, avg);

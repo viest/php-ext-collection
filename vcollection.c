@@ -35,7 +35,7 @@ static int le_vcollection;
 
 zend_class_entry *vcollection_ce;
 
-ZEND_BEGIN_ARG_INFO_EX(global_config_arg, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(new_arg, 0, 0, 1)
     ZEND_ARG_ARRAY_INFO(0, var_items, 0)
 ZEND_END_ARG_INFO()
 
@@ -75,22 +75,34 @@ ZEND_BEGIN_ARG_INFO_EX(where_arg, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_METHOD(vcollection, __construct) {
-	zval *var_items;
-	zval pro_items;
 
-#ifdef FAST_ZPP
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &var_items) == FAILURE) {
-		return;
+}
+
+ZEND_METHOD(vcollection, getinstance) {
+	zval *instance, *var_items;
+	
+	instance = zend_read_static_property(vcollection_ce, "instance", sizeof("instance")-1, 0);
+
+	if(Z_TYPE_P(instance) == IS_NULL) {
+
+	#ifdef FAST_ZPP
+		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &var_items) == FAILURE) {
+			return;
+		}
+	#else
+		ZEND_PARSE_PARAMETERS_START(1, 1)
+			Z_PARAM_ARRAY(&var_items)
+		ZEND_PARSE_PARAMETERS_END();
+	#endif
+
+		object_init_ex(return_value, vcollection_ce);
+
+		zend_update_property(vcollection_ce, return_value, "items", sizeof("items")-1, var_items TSRMLS_CC);
+		zend_update_static_property(vcollection_ce, "instance", sizeof("instance")-1, return_value TSRMLS_CC);
+
+	} else {
+		RETURN_ZVAL(instance, 1, 0);
 	}
-#else
- 	ZEND_PARSE_PARAMETERS_START(1, 1)
- 		Z_PARAM_ARRAY(&var_items)
- 	ZEND_PARSE_PARAMETERS_END();
-#endif
-
- 	ZVAL_COPY(&pro_items, var_items);
-    zend_update_property(Z_OBJCE_P(getThis()), getThis(), "items", sizeof("items")-1, &pro_items TSRMLS_CC);
-    zval_ptr_dtor(var_items);
 }
 
 ZEND_METHOD(vcollection, map) {
@@ -661,7 +673,8 @@ PHP_MINFO_FUNCTION(vcollection)
 
 
 const zend_function_entry vcollection_functions[] = {
-	ZEND_ME(vcollection, __construct, global_config_arg, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	ZEND_ME(vcollection, __construct, new_arg, ZEND_ACC_PRIVATE)
+	ZEND_ME(vcollection, getinstance, new_arg, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_ME(vcollection, map, call_fun, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, collapse, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
@@ -683,7 +696,9 @@ PHP_MINIT_FUNCTION(vcollection)
 
 	INIT_NS_CLASS_ENTRY(ce, "Vikin", "Vcollection", vcollection_functions);
 	vcollection_ce = zend_register_internal_class(&ce TSRMLS_CC);
-	zend_declare_property_null(vcollection_ce, "items", sizeof("items")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+
+	zend_declare_property_null(vcollection_ce, "instance", sizeof("instance")-1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(vcollection_ce, "items", sizeof("items")-1, ZEND_ACC_PUBLIC);
 
 	return SUCCESS;
 }
