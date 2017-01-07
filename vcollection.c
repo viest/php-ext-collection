@@ -612,7 +612,18 @@ ZEND_METHOD(vcollection, where) {
 	 							ZVAL_LONG(&retvala, 1);
 	 						}
 	 						zval_ptr_dtor(&retvala_long);
+	 					} else if (Z_TYPE_P(&column_htbl->arData[no_temp].val) == IS_DOUBLE) {
+	 						zval retvala_double;
+	 						v_floatval(arg_val, &retvala_double);
+	 						php_var_dump(&column_htbl->arData[no_temp].val, 2);
+	 						if(Z_DVAL_P(&column_htbl->arData[no_temp].val) == zval_get_double(&retvala_double)) {
+	 							ZVAL_LONG(&retvala, 0);
+	 						}else{
+	 							ZVAL_LONG(&retvala, 1);
+	 						}
+	 						zval_ptr_dtor(&retvala_double);
 	 					}
+
 	 					if(zval_get_long(&retvala) == 0) {
 	 						HashTable *arr_htbl = Z_ARRVAL_P(array);
 	 						add_next_index_zval(&result, &arr_htbl->arData[long_key].val);

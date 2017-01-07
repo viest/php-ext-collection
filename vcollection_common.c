@@ -245,3 +245,21 @@ void __intval (zend_string *op1, zval *retval) {
   }
   zval_ptr_dtor(&arg[0]);
 }
+
+void __floatval (zend_string *op1, zval *retval) {
+  zval floatval;
+  zval arg[1];
+  FLOATVAL(&floatval);
+
+  ZVAL_STR_COPY(&arg[0], op1);
+
+  if (call_user_function(EG(function_table), NULL, &floatval, retval, 1, arg) == FAILURE) {
+    zval_ptr_dtor(&arg[0]);        
+    zval_ptr_dtor(retval);
+    ZVAL_UNDEF(retval);
+  } else if (Z_ISUNDEF_P(retval)) {
+    zval_ptr_dtor(&arg[0]);
+    ZVAL_NULL(retval);
+  }
+  zval_ptr_dtor(&arg[0]);
+}
