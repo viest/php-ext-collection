@@ -570,6 +570,7 @@ ZEND_METHOD(vcollection, where) {
  		HashTable *explode_htbl = Z_ARRVAL(explode_retval);
  		
  		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), long_key, str_key, value) {
+ 			explode_no = 0;
  			Bucket *explode_bucket = &explode_htbl->arData[explode_no];
  			v_key_exists(&(explode_bucket->val), value, &exists_retval);
 
@@ -598,7 +599,6 @@ ZEND_METHOD(vcollection, where) {
 	 				HashTable *column_htbl = Z_ARRVAL(column_retval);
 	 				zend_long no_temp = 0;
 
-
 	 				if(zend_hash_num_elements(column_htbl) == 1 && Z_TYPE_P(&column_htbl->arData[no_temp].val) != IS_ARRAY) {
 	 					zval retvala;
 	 					if(Z_TYPE_P(&column_htbl->arData[no_temp].val) == IS_STRING){
@@ -621,6 +621,11 @@ ZEND_METHOD(vcollection, where) {
 	 					explode_no = 0;
 	 					break;
 	 				}
+
+	 				if(explode_no > zend_hash_num_elements(explode_htbl)) {
+	 					break;
+	 				}
+
 	 				explode_no++;
  				}
  				
