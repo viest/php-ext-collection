@@ -40,7 +40,7 @@ $test = vcollect([1, 2, 3, 4, 5, 6]);
 ******
 |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |^_^ |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|[map](#map)|[collapse](#collapse)|[avg](#avg)|[has](#has)|[mx](#mx)|[mi](#mi)|[toJson](#tojson)|[toArray](#toarray)|[take](#take)|[pluck](#pluck)|
+|[map](#map)|[collapse](#collapse)|[avg](#avg)|[has](#has)|[max](#max)|[min](#min)|[toJson](#tojson)|[toArray](#toarray)|[take](#take)|[pluck](#pluck)|
 |[where](#where)||||||||||
 
 ******
@@ -101,16 +101,16 @@ $vcollect->has('email');
 // false
 ```
 
-#### mx
+#### max
 返回集合中的最大值
 ```php
 $vcollect = vcollect([1,2,3,4,5]);
 
-$vcollect->mx();
+$vcollect->max();
 
 //(int)5
 ```
-你也可以通过传入`键值`来获取指定键的最大值
+你也可以通过传入`键值`来获取`二维数组`中指定键的最大值
 ```php
 $vcollect = vcollect([
         ['a'=>1.1],
@@ -118,17 +118,17 @@ $vcollect = vcollect([
         ['a'=>8]
     ]
 );
-$vcollect->mx('a');
+$vcollect->max('a');
 
 //(int)8
 ```
 
-#### mi
+#### min
 返回集合中的最小值
 ```php
 $vcollect = vcollect([1,2,3,4,5]);
 
-$vcollect->mi();
+$vcollect->min();
 
 //(int)1
 ```

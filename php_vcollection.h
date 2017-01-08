@@ -47,7 +47,7 @@ PHP_METHOD(vcollection_ce, collapse);
 PHP_METHOD(vcollection_ce, avg);
 PHP_METHOD(vcollection_ce, has);
 PHP_METHOD(vcollection_ce, max);
-PHP_METHOD(vcollection_ce, mi);
+PHP_METHOD(vcollection_ce, min);
 PHP_METHOD(vcollection_ce, toArray);
 PHP_METHOD(vcollection_ce, toJson);
 PHP_METHOD(vcollection_ce, take);

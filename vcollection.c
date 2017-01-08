@@ -351,7 +351,7 @@ PHP_METHOD(vcollection, max) {
  	}
 }
 
-ZEND_METHOD(vcollection, mi) {
+PHP_METHOD(vcollection, min) {
 	zval *arrays = NULL;
 	zval *value;
   	zval call_result, rv, call_args[2];
@@ -692,7 +692,7 @@ const zend_function_entry vcollection_functions[] = {
 	ZEND_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, has, has_arg, ZEND_ACC_PUBLIC)
 	PHP_ME(vcollection, max, max_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, mi, min_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, min, min_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, toJson, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, take, take_arg, ZEND_ACC_PUBLIC)
