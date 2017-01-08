@@ -298,7 +298,7 @@ ZEND_METHOD(vcollection, has) {
  	}
 }
 
-ZEND_METHOD(vcollection, mx) {
+PHP_METHOD(vcollection, max) {
 	zval *arrays = NULL;
 	zval *value;
   	zval call_result, rv, call_args[2];
@@ -592,6 +592,7 @@ ZEND_METHOD(vcollection, where) {
 							}
 	 					}
 	 				} else {
+	 					if(explode_no >= zend_hash_num_elements(explode_htbl)) { break; }
 	 					explode_bucket = &explode_htbl->arData[explode_no];
 	 					v_column(&column_retval, &(explode_bucket->val), &column_retval);
 	 				}
@@ -629,10 +630,6 @@ ZEND_METHOD(vcollection, where) {
 	 					}
 	 					zval_ptr_dtor(&retvala);
 	 					explode_no = 0;
-	 					break;
-	 				}
-
-	 				if(explode_no > zend_hash_num_elements(explode_htbl)) {
 	 					break;
 	 				}
 
@@ -694,7 +691,7 @@ const zend_function_entry vcollection_functions[] = {
 	ZEND_ME(vcollection, collapse, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, has, has_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, mx, max_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, max, max_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, mi, min_arg, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, toJson, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
