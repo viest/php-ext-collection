@@ -74,11 +74,11 @@ ZEND_BEGIN_ARG_INFO_EX(where_arg, 0, 0, 2)
 	ZEND_ARG_INFO(0, arg_conditional)
 ZEND_END_ARG_INFO()
 
-ZEND_METHOD(vcollection, __construct) {
+PHP_METHOD(vcollection, __construct) {
 
 }
 
-ZEND_METHOD(vcollection, getinstance) {
+PHP_METHOD(vcollection, getinstance) {
 	zval *instance, *var_items;
 	
 	instance = zend_read_static_property(vcollection_ce, "instance", sizeof("instance")-1, 0);
@@ -105,7 +105,7 @@ ZEND_METHOD(vcollection, getinstance) {
 	}
 }
 
-ZEND_METHOD(vcollection, map) {
+PHP_METHOD(vcollection, map) {
 	zval *arrays = NULL;
 	zval *value;
 	zval args[2];
@@ -154,7 +154,7 @@ ZEND_METHOD(vcollection, map) {
 	RETURN_ZVAL(&map_retval, 0, 0);
 }
 
-ZEND_METHOD(vcollection, collapse) {
+PHP_METHOD(vcollection, collapse) {
 	zval *items = NULL;
 	zval *value;
 	zval *valuea;
@@ -184,7 +184,7 @@ ZEND_METHOD(vcollection, collapse) {
 	RETURN_ZVAL(&retval, 0, 0);
 }
 
-ZEND_METHOD(vcollection, avg) {
+PHP_METHOD(vcollection, avg) {
 	zval *arrays = NULL;
 	zval call_args[2];
 	zval *value;
@@ -269,7 +269,7 @@ ZEND_METHOD(vcollection, avg) {
 	}
 }
 
-ZEND_METHOD(vcollection, has) {
+PHP_METHOD(vcollection, has) {
 	zval *arrays = NULL;
 	zval *arg;
 	zend_long arg_long;
@@ -404,7 +404,7 @@ PHP_METHOD(vcollection, min) {
  	}
 }
 
-ZEND_METHOD (vcollection, toJson) {
+PHP_METHOD (vcollection, toJson) {
 	zval *arrays = NULL;
 	zval rv, call_result, function_to_json;
 
@@ -423,7 +423,7 @@ ZEND_METHOD (vcollection, toJson) {
 	RETURN_ZVAL(&call_result, 0 ,0);
 }
 
-ZEND_METHOD (vcollection, toArray) {
+PHP_METHOD (vcollection, toArray) {
 	zval *arrays = NULL;
 	zval rv, retval;
 	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv);
@@ -436,7 +436,7 @@ ZEND_METHOD (vcollection, toArray) {
 	RETURN_ZVAL(&retval, 0, 0);
 }
 
-ZEND_METHOD (vcollection, take) {
+PHP_METHOD (vcollection, take) {
 	zval *arg;
 	zval rv, function_to_slice, call_result, args[3], retval;
 	zval *arrays = NULL;
@@ -485,7 +485,7 @@ ZEND_METHOD (vcollection, take) {
  	}
 }
 
-ZEND_METHOD(vcollection, pluck) {
+PHP_METHOD(vcollection, pluck) {
 	zval *array = NULL;
 	zval rv;
 	zval combine;
@@ -533,7 +533,7 @@ ZEND_METHOD(vcollection, pluck) {
 	RETURN_ZVAL(&result_val, 0, 0);
 }
 
-ZEND_METHOD(vcollection, where) {
+PHP_METHOD(vcollection, where) {
 	zval *array = NULL;
 	zval *value;
 	zval rv;
@@ -685,19 +685,19 @@ PHP_MINFO_FUNCTION(vcollection)
 
 
 const zend_function_entry vcollection_functions[] = {
-	ZEND_ME(vcollection, __construct, new_arg, ZEND_ACC_PRIVATE)
-	ZEND_ME(vcollection, getinstance, new_arg, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	ZEND_ME(vcollection, map, call_fun, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, collapse, NULL, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, has, has_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, __construct, new_arg, ZEND_ACC_PRIVATE)
+	PHP_ME(vcollection, getinstance, new_arg, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(vcollection, map, call_fun, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, collapse, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, has, has_arg, ZEND_ACC_PUBLIC)
 	PHP_ME(vcollection, max, max_arg, ZEND_ACC_PUBLIC)
 	PHP_ME(vcollection, min, min_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, toJson, NULL, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, take, take_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, pluck, pluck_arg, ZEND_ACC_PUBLIC)
-	ZEND_ME(vcollection, where, where_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, toJson, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, take, take_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, pluck, pluck_arg, ZEND_ACC_PUBLIC)
+	PHP_ME(vcollection, where, where_arg, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
