@@ -118,6 +118,10 @@ PHP_FUNCTION(av)
 				zval strcmp_retval;
 				if (depth_long_key < 1) {
 					while (1) {
+						if(!Z_ARRVAL_P(val_data)->arData[num].key) {
+							ZVAL_NULL(&temp_value);
+							break;
+						}
 						v_strcmp(Z_ARRVAL_P(val_data)->arData[num].key, Z_STR_P(depth_value), &strcmp_retval);
 						if (zval_get_long(&strcmp_retval) == 0) {
 							ZVAL_COPY(&temp_value, &Z_ARRVAL_P(val_data)->arData[num].val);
@@ -128,6 +132,7 @@ PHP_FUNCTION(av)
 					}
 					continue;
 				}
+				if(Z_TYPE(temp_value) == IS_NULL) break;
 				v_strcmp(Z_ARRVAL(temp_value)->arData[num].key, Z_STR_P(depth_value), &strcmp_retval);
 				if (zval_get_long(&strcmp_retval) == 0) {
 					ZVAL_COPY(&temp_value, &Z_ARRVAL(temp_value)->arData[num].val);
