@@ -22,6 +22,7 @@
 #endif
 
 #include "php.h"
+#include "ext/standard/php_var.h"
 #include "vcollection_common.h"
 
 void __get_array_max (HashTable *htbl, double *retval) {

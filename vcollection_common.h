@@ -25,6 +25,7 @@
 #define STRCMP(arg)  ZVAL_STRING(arg, "strcmp")
 #define INTVAL(arg)  ZVAL_STRING(arg, "intval")
 #define FLOATVAL(arg) ZVAL_STRING(arg, "floatval")
+#define ARRAY_POP(arg) ZVAL_STRING(arg, "array_pop")
 
 void __get_array_max (HashTable *htbl, double *retval);
 void __get_array_min (HashTable *htbl, double *retval);
@@ -35,11 +36,13 @@ void __column(zval *array, zval *str_arg, zval *column_retval);
 void __strcmp(zend_string *op1, zend_string *op2, zval *retval);
 void __intval(zend_string *op1, zval *retval);
 void __floatval(zend_string *op1, zval *retval);
+void __get_array_pop(zval *array, zval *retval);
 
 #define v_array_max(htbl, retval) __get_array_max(htbl, retval)
 #define v_array_mix(htbl, retval) __get_array_min(htbl, retval)
 #define v_collect_pluck(array, args, retval) __get_collect_pluck(array, args, retval)
 #define v_key_exists(key, array, retval) __key_exists(key, array, retval)
+#define v_array_pop(array, retval) __get_array_pop(array, retval)
 #define v_explode(arg, retval) __explode(arg, retval)
 #define v_column(array, arg, retval) __column(array, arg, retval)
 #define v_strcmp(op1, op2, retval) __strcmp(op1, op2, retval)
