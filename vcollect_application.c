@@ -25,15 +25,14 @@
 #include "ext/standard/info.h"
 #include "ext/standard/basic_functions.h"
 #include "ext/standard/php_var.h"
-#include "vcollection_common.h"
-#include "php_vcollection.h"
+#include "php_vcollect.h"
+#include "vcollect_application.h"
+#include "vcollect_common.h"
 
 #include "zend.h"
 #include "zend_API.h"
 
-static int le_vcollection;
-
-zend_class_entry *vcollection_ce;
+zend_class_entry *vcollect_application_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(new_arg, 0, 0, 1)
     ZEND_ARG_ARRAY_INFO(0, var_items, 0)
@@ -74,14 +73,12 @@ ZEND_BEGIN_ARG_INFO_EX(where_arg, 0, 0, 2)
 	ZEND_ARG_INFO(0, arg_conditional)
 ZEND_END_ARG_INFO()
 
-PHP_METHOD(vcollection, __construct) {
+PHP_METHOD(vcollect_application, __construct) {}
 
-}
-
-PHP_METHOD(vcollection, getinstance) {
+PHP_METHOD(vcollect_application, getInstance) {
 	zval *instance, *var_items;
 	
-	instance = zend_read_static_property(vcollection_ce, "instance", sizeof("instance")-1, 0);
+	instance = zend_read_static_property(vcollect_application_ce, ZEND_STRL("instance"), 0);
 
 	if(Z_TYPE_P(instance) == IS_NULL) {
 
@@ -95,17 +92,17 @@ PHP_METHOD(vcollection, getinstance) {
 		ZEND_PARSE_PARAMETERS_END();
 	#endif
 
-		object_init_ex(return_value, vcollection_ce);
+		object_init_ex(instance, vcollect_application_ce);
 
-		zend_update_property(vcollection_ce, return_value, "items", sizeof("items")-1, var_items TSRMLS_CC);
-		zend_update_static_property(vcollection_ce, "instance", sizeof("instance")-1, return_value TSRMLS_CC);
-
+        zend_update_static_property(vcollect_application_ce, ZEND_STRL("instance"), instance TSRMLS_CC);
+		zend_update_property(vcollect_application_ce, instance, ZEND_STRL("items"), var_items TSRMLS_CC);
 	} else {
 		RETURN_ZVAL(instance, 1, 0);
 	}
+	RETURN_ZVAL(instance, 1, 0);
 }
 
-PHP_METHOD(vcollection, map) {
+PHP_METHOD(vcollect_application, map) {
 	zval *arrays = NULL;
 	zval *value;
 	zval args[2];
@@ -116,7 +113,7 @@ PHP_METHOD(vcollection, map) {
 	zend_fcall_info fci = empty_fcall_info;
 	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 	HashTable *htbl;
-	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 	ZEND_PARSE_PARAMETERS_START(1, -1)
 		Z_PARAM_FUNC_EX(fci, fci_cache, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
@@ -154,7 +151,7 @@ PHP_METHOD(vcollection, map) {
 	RETURN_ZVAL(&map_retval, 0, 0);
 }
 
-PHP_METHOD(vcollection, collapse) {
+PHP_METHOD(vcollect_application, collapse) {
 	zval *items = NULL;
 	zval *value;
 	zval *valuea;
@@ -165,7 +162,7 @@ PHP_METHOD(vcollection, collapse) {
 	HashTable *htbla;
 	zval *object;
 	array_init(&ret_val);
-	items = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+	items = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 	htbl = Z_ARRVAL_P(items);
 	ZEND_HASH_FOREACH_VAL(htbl, value) {
 		if( Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) == IS_ARRAY ){
@@ -179,12 +176,12 @@ PHP_METHOD(vcollection, collapse) {
         	add_next_index_zval(&ret_val, &temp);
     	}
 	} ZEND_HASH_FOREACH_END();
-	zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, &ret_val TSRMLS_CC);
+	zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &ret_val TSRMLS_CC);
 	ZVAL_COPY(&retval, getThis());
 	RETURN_ZVAL(&retval, 0, 0);
 }
 
-PHP_METHOD(vcollection, avg) {
+PHP_METHOD(vcollect_application, avg) {
 	zval *arrays = NULL;
 	zval call_args[2];
 	zval *value;
@@ -207,7 +204,7 @@ PHP_METHOD(vcollection, avg) {
 		Z_PARAM_OPTIONAL
 		Z_PARAM_STR(args)
 	ZEND_PARSE_PARAMETERS_END();
-	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 	if (args != NULL) {
 		ZVAL_COPY(&call_args[0], arrays);
 		ZVAL_STR_COPY(&call_args[1], args);
@@ -269,7 +266,7 @@ PHP_METHOD(vcollection, avg) {
 	}
 }
 
-PHP_METHOD(vcollection, has) {
+PHP_METHOD(vcollect_application, has) {
 	zval *arrays = NULL;
 	zval *arg;
 	zend_long arg_long;
@@ -286,7 +283,7 @@ PHP_METHOD(vcollection, has) {
  		Z_PARAM_ZVAL(&arg)
  	ZEND_PARSE_PARAMETERS_END();
 #endif
- 	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
  	htbl = Z_ARRVAL_P(arrays);
  	if(Z_TYPE_P(arg) == IS_STRING) {
  		RETURN_BOOL(zend_hash_exists(htbl, Z_STR(*arg)));
@@ -298,7 +295,7 @@ PHP_METHOD(vcollection, has) {
  	}
 }
 
-PHP_METHOD(vcollection, max) {
+PHP_METHOD(vcollect_application, max) {
 	zval *arrays = NULL;
 	zval *value;
   	zval call_result, rv, call_args[2];
@@ -317,7 +314,7 @@ PHP_METHOD(vcollection, max) {
  		Z_PARAM_STR(arg)
  	ZEND_PARSE_PARAMETERS_END();
 #endif
- 	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
  	if(arg != NULL) {
     	ZVAL_COPY(&call_args[0], arrays);
 		ZVAL_STR_COPY(&call_args[1], arg);
@@ -351,7 +348,7 @@ PHP_METHOD(vcollection, max) {
  	}
 }
 
-PHP_METHOD(vcollection, min) {
+PHP_METHOD(vcollect_application, min) {
 	zval *arrays = NULL;
 	zval *value;
   	zval call_result, rv, call_args[2];
@@ -370,7 +367,7 @@ PHP_METHOD(vcollection, min) {
  		Z_PARAM_STR(arg)
  	ZEND_PARSE_PARAMETERS_END();
 #endif
- 	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
  	if(arg != NULL) {
     	ZVAL_COPY(&call_args[0], arrays);
 		ZVAL_STR_COPY(&call_args[1], arg);
@@ -404,12 +401,12 @@ PHP_METHOD(vcollection, min) {
  	}
 }
 
-PHP_METHOD (vcollection, toJson) {
+PHP_METHOD (vcollect_application, toJson) {
 	zval *arrays = NULL;
 	zval rv, call_result, function_to_json;
 
 	ZVAL_STRING(&function_to_json, "json_encode");
-	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 1, &rv TSRMLS_DC);
+	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 1, &rv TSRMLS_DC);
 
 	if (call_user_function(EG(function_table), NULL, &function_to_json, &call_result, 1, arrays) == FAILURE) {
 		zval_dtor(arrays);
@@ -423,20 +420,20 @@ PHP_METHOD (vcollection, toJson) {
 	RETURN_ZVAL(&call_result, 0 ,0);
 }
 
-PHP_METHOD (vcollection, toArray) {
+PHP_METHOD (vcollect_application, toArray) {
 	zval *arrays = NULL;
 	zval rv, retval;
-	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv);
+	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv);
 
 	ZVAL_COPY(&retval, arrays);
 	zval_ptr_dtor(arrays);
 
-	zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, &retval);
+	zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &retval);
 
 	RETURN_ZVAL(&retval, 0, 0);
 }
 
-PHP_METHOD (vcollection, take) {
+PHP_METHOD (vcollect_application, take) {
 	zval *arg;
 	zval rv, function_to_slice, call_result, args[3], retval;
 	zval *arrays = NULL;
@@ -453,7 +450,7 @@ PHP_METHOD (vcollection, take) {
 #endif
 
  	ZVAL_STRING(&function_to_slice, "array_slice");
- 	arrays = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 
  	if(Z_TYPE_P(arg) == IS_LONG) {
  		if(Z_LVAL_P(arg) < 0) {
@@ -477,7 +474,7 @@ PHP_METHOD (vcollection, take) {
 			zval_ptr_dtor(&args[0]);
 			ZVAL_NULL(&call_result);
 		}
-		zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, &call_result TSRMLS_CC);
+		zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &call_result TSRMLS_CC);
 		ZVAL_COPY(&retval, getThis());
 		RETURN_ZVAL(&retval, 0, 0);
  	} else {
@@ -485,7 +482,7 @@ PHP_METHOD (vcollection, take) {
  	}
 }
 
-PHP_METHOD(vcollection, pluck) {
+PHP_METHOD(vcollect_application, pluck) {
 	zval *array = NULL;
 	zval rv;
 	zval combine;
@@ -508,7 +505,7 @@ PHP_METHOD(vcollection, pluck) {
  	ZEND_PARSE_PARAMETERS_END();
 #endif
 
- 	array = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	array = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
   	v_collect_pluck(array, arg_val, &result_val);
 
   	if(arg_key != NULL) {
@@ -533,7 +530,7 @@ PHP_METHOD(vcollection, pluck) {
 	RETURN_ZVAL(&result_val, 0, 0);
 }
 
-PHP_METHOD(vcollection, where) {
+PHP_METHOD(vcollect_application, where) {
 	zval *array = NULL;
 	zval *value;
 	zval rv;
@@ -561,7 +558,7 @@ PHP_METHOD(vcollection, where) {
  	ZEND_PARSE_PARAMETERS_END();
 #endif
 
- 	array = zend_read_property(vcollection_ce, getThis(), "items", sizeof("items")-1, 0, &rv TSRMLS_DC);
+ 	array = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 
  	// if(arg_conditional == NULL) {
  		array_init(&result);
@@ -583,8 +580,8 @@ PHP_METHOD(vcollection, where) {
 	 				} else if(explode_no == 0 && zend_hash_num_elements(explode_htbl) == 1) {
 	 					array_init(&column_retval);
 	 					HashTable *value_htbl = Z_ARRVAL_P(value);
-	 					for (int i = 0; i < zend_hash_num_elements(value_htbl); ++i)
-	 					{
+	 					int i;
+	 					for (i = 0; i < zend_hash_num_elements(value_htbl); ++i) {
 							zval retval;
 							v_strcmp(value_htbl->arData[i].key, Z_STR(explode_bucket->val), &retval);
 							if( zval_get_long(&retval) == 0) {
@@ -640,7 +637,7 @@ PHP_METHOD(vcollection, where) {
  			ZVAL_NULL(&exists_retval);
 		} ZEND_HASH_FOREACH_END();
 
-		zend_update_property(vcollection_ce, getThis(), "items", sizeof("items")-1, &result);
+		zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &result);
 
 		ZVAL_COPY(return_value, getThis());
 		RETURN_ZVAL(return_value, 0, 0);
@@ -650,87 +647,31 @@ PHP_METHOD(vcollection, where) {
  	// }
 }
 
-PHP_MSHUTDOWN_FUNCTION(vcollection)
-{
-	return SUCCESS;
-}
-
-PHP_RINIT_FUNCTION(vcollection)
-{
-#if defined(COMPILE_DL_VCOLLECTION) && defined(ZTS)
-	ZEND_TSRMLS_CACHE_UPDATE();
-#endif
-	return SUCCESS;
-}
-
-
-PHP_RSHUTDOWN_FUNCTION(vcollection)
-{
-	return SUCCESS;
-}
-
-
-PHP_MINFO_FUNCTION(vcollection)
-{
-	php_info_print_table_start();
-	php_info_print_table_header(2, "vcollection support", "enabled");
-
-	#if defined(PHP_VCOLLECTION_VERSION) && defined(PHP_VCOLLECTION_AUTHOR)
-	php_info_print_table_row(2, "Vcollect Version", PHP_VCOLLECTION_VERSION);
-	php_info_print_table_row(2, "Author", PHP_VCOLLECTION_AUTHOR);
-	#endif
-
-	php_info_print_table_end();
-}
-
-
-const zend_function_entry vcollection_functions[] = {
-	PHP_ME(vcollection, __construct, new_arg, ZEND_ACC_PRIVATE)
-	PHP_ME(vcollection, getinstance, new_arg, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(vcollection, map, call_fun, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, collapse, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, avg, avg_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, has, has_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, max, max_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, min, min_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, toJson, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, take, take_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, pluck, pluck_arg, ZEND_ACC_PUBLIC)
-	PHP_ME(vcollection, where, where_arg, ZEND_ACC_PUBLIC)
+const zend_function_entry application_functions[] = {
+	PHP_ME(vcollect_application, __construct,    new_arg,    ZEND_ACC_PRIVATE)
+	PHP_ME(vcollect_application, getInstance,    new_arg,    ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(vcollect_application, map,            call_fun,   ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, collapse,       NULL,       ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, avg,            avg_arg,    ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, has,            has_arg,    ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, max,            max_arg,    ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, min,            min_arg,    ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, toJson,         NULL,       ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, toArray,        NULL,       ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, take,           take_arg,   ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, pluck,          pluck_arg,  ZEND_ACC_PUBLIC)
+	PHP_ME(vcollect_application, where,          where_arg,  ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
-
-PHP_MINIT_FUNCTION(vcollection)
-{
+VCOLLECT_STARTUP_FUNCTION(application) {
 	zend_class_entry ce;
 
-	INIT_NS_CLASS_ENTRY(ce, "Vikin", "Vcollection", vcollection_functions);
-	vcollection_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	INIT_NS_CLASS_ENTRY(ce, "Vikin", "Vcollection", application_functions);
+	vcollect_application_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-	zend_declare_property_null(vcollection_ce, "instance", sizeof("instance")-1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
-	zend_declare_property_null(vcollection_ce, "items", sizeof("items")-1, ZEND_ACC_PUBLIC);
+	zend_declare_property_null(vcollect_application_ce, ZEND_STRL("instance"),   ZEND_ACC_PROTECTED | ZEND_ACC_STATIC);
+	zend_declare_property_null(vcollect_application_ce, ZEND_STRL("items"),      ZEND_ACC_PUBLIC);
 
 	return SUCCESS;
 }
-
-zend_module_entry vcollection_module_entry = {
-	STANDARD_MODULE_HEADER,
-	"vcollection",
-	vcollection_functions,
-	PHP_MINIT(vcollection),
-	PHP_MSHUTDOWN(vcollection),
-	PHP_RINIT(vcollection),
-	PHP_RSHUTDOWN(vcollection),
-	PHP_MINFO(vcollection),
-	PHP_VCOLLECTION_VERSION,
-	STANDARD_MODULE_PROPERTIES
-};
-
-#ifdef COMPILE_DL_VCOLLECTION
-#ifdef ZTS
-ZEND_TSRMLS_CACHE_DEFINE()
-#endif
-ZEND_GET_MODULE(vcollection)
-#endif

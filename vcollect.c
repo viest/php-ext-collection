@@ -22,22 +22,19 @@
 
 #include "php.h"
 #include "php_ini.h"
+#include "ext/standard/info.h"
+
 #include "zend_API.h"
 #include "zend_interfaces.h"
-#include "ext/standard/info.h"
+
 #include "php_vcollect.h"
-#include "php_vcollection.h"
-#include "vcollection_common.h"
+#include "vcollect_application.h"
+#include "vcollect_common.h"
 #include "ext/standard/php_var.h"
-
-extern zend_class_entry *vcollection_ce;
-
-static int le_vcollect;
 
 PHP_FUNCTION(vcollect)
 {
-	zval *var_array;
-	zval class_name, function_name;
+	zval *var_array, *obj, class_name;
 	zend_class_entry *vcoll_ce;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &var_array) == FAILURE) {
@@ -45,11 +42,10 @@ PHP_FUNCTION(vcollect)
 	}
 
 	ZVAL_STRING(&class_name, CLASS_NAME);
-	ZVAL_STRING(&function_name, "getInstance");
 
 	vcoll_ce = zend_fetch_class(zval_get_string(&class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
 	object_init_ex(return_value,vcoll_ce);
-	zend_call_method_with_1_params(return_value, vcoll_ce, NULL,"getinstance", return_value, var_array);
+	zend_call_method_with_1_params(return_value, NULL, NULL, "getInstance", return_value, var_array);
 }
 
 PHP_FUNCTION(av)
@@ -168,7 +164,8 @@ PHP_FUNCTION(av)
 
 PHP_MINIT_FUNCTION(vcollect)
 {
-	ZEND_MODULE_STARTUP_N(vcollection) (INIT_FUNC_ARGS_PASSTHRU);
+	VCOLLECT_STARTUP_MODULE(application);
+
 	return SUCCESS;
 }
 
@@ -196,17 +193,17 @@ PHP_MINFO_FUNCTION(vcollect)
 	php_info_print_table_start();
 	php_info_print_table_header(2, "vcollect support", "enabled");
 
-	#if defined(PHP_VCOLLECTION_VERSION) && defined(PHP_VCOLLECTION_AUTHOR)
-	php_info_print_table_row(2, "Vcollect Version", PHP_VCOLLECTION_VERSION);
-	php_info_print_table_row(2, "Author", PHP_VCOLLECTION_AUTHOR);
+	#if defined(PHP_APPLICATION_VERSION) && defined(PHP_APPLICATION_AUTHOR)
+	php_info_print_table_row(2, "Vcollect Version", PHP_APPLICATION_VERSION);
+	php_info_print_table_row(2, "Author", PHP_APPLICATION_AUTHOR);
 	#endif
 
 	php_info_print_table_end();
 }
 
 const zend_function_entry vcollect_functions[] = {
-	PHP_FE(vcollect,	NULL)
-	PHP_FE(av,	NULL)
+	PHP_FE(vcollect, NULL)
+	PHP_FE(av, NULL)
 	PHP_FE_END
 };
 
@@ -219,7 +216,7 @@ zend_module_entry vcollect_module_entry = {
 	PHP_RINIT(vcollect),
 	PHP_RSHUTDOWN(vcollect),
 	PHP_MINFO(vcollect),
-	PHP_VCOLLECT_VERSION,
+	PHP_APPLICATION_VERSION,
 	STANDARD_MODULE_PROPERTIES
 };
 

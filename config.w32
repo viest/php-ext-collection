@@ -8,6 +8,6 @@
 // ARG_ENABLE("vcollect", "enable vcollect support", "no");
 
 if (PHP_VCOLLECT != "no") {
-	EXTENSION("vcollect", "vcollection.c vcollection_common.c vcollect.c", PHP_EXTNAME_SHARED, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
+	EXTENSION("vcollect", "vcollect_application.c vcollect_common.c vcollect.c", PHP_EXTNAME_SHARED, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
 }
 
