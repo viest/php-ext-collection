@@ -34,18 +34,13 @@
 
 PHP_FUNCTION(vcollect)
 {
-	zval *var_array, *obj, class_name;
-	zend_class_entry *vcoll_ce;
+	zval *var_array;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &var_array) == FAILURE) {
 		RETURN_NULL();
 	}
 
-	ZVAL_STRING(&class_name, CLASS_NAME);
-
-	vcoll_ce = zend_fetch_class(zval_get_string(&class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-	object_init_ex(return_value,vcoll_ce);
-	zend_call_method_with_1_params(return_value, NULL, NULL, "getInstance", return_value, var_array);
+	zend_call_method_with_1_params(NULL, NULL, NULL, CLASS_NAME, return_value, var_array);
 }
 
 PHP_FUNCTION(av)
