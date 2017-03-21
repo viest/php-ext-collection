@@ -43,14 +43,14 @@ PHP_FUNCTION(vcollect)
 	zend_call_method_with_1_params(NULL, NULL, NULL, CLASS_NAME, return_value, var_array);
 }
 
-PHP_FUNCTION(av)
+PHP_FUNCTION(array_var)
 {
 	zval *key_data, *val_data, *value, *orig_var, *var_name, *depth_value;
 	zval explode_depth_retval, explode_retval, exists_retval;
 	zend_long count;
 	zend_ulong long_key, depth_long_key;
 	zend_array *symbol_table;
-    zend_string *str_key, *depth_str_key;
+  zend_string *str_key, *depth_str_key;
 
 	#ifdef FAST_ZPP
 		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "aa", &key_data, &val_data) == FAILURE) {
@@ -188,9 +188,10 @@ PHP_MINFO_FUNCTION(vcollect)
 	php_info_print_table_start();
 	php_info_print_table_header(2, "vcollect support", "enabled");
 
-	#if defined(PHP_APPLICATION_VERSION) && defined(PHP_APPLICATION_AUTHOR)
+	#if defined(PHP_APPLICATION_VERSION) && defined(PHP_APPLICATION_AUTHOR) && defined(AUTHOR_BLOG_URL)
 	php_info_print_table_row(2, "Vcollect Version", PHP_APPLICATION_VERSION);
 	php_info_print_table_row(2, "Author", PHP_APPLICATION_AUTHOR);
+	php_info_print_table_row(2, "Author Blog", AUTHOR_BLOG_URL);
 	#endif
 
 	php_info_print_table_end();
@@ -198,7 +199,7 @@ PHP_MINFO_FUNCTION(vcollect)
 
 const zend_function_entry vcollect_functions[] = {
 	PHP_FE(vcollect, NULL)
-	PHP_FE(av, NULL)
+	PHP_FE(array_var, NULL)
 	PHP_FE_END
 };
 
