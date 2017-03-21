@@ -24,7 +24,7 @@ extern zend_module_entry vcollect_module_entry;
 
 #define PHP_APPLICATION_VERSION "1.0.0"
 #define PHP_APPLICATION_AUTHOR "Jiexin Wang"
-#define AUTHOR_BLOG_URL "http://www.vikin.vv"
+#define AUTHOR_BLOG_URL "http://www.vikin.cc"
 #define CLASS_NAME "Vikin\\Vcollection::getInstance"
 
 #ifdef PHP_WIN32
