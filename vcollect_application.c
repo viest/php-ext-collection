@@ -77,61 +77,64 @@ PHP_METHOD(vcollect_application, __construct) {}
 
 PHP_METHOD(vcollect_application, getInstance) {
 	zval *instance, *var_items;
-	
+
 	instance = zend_read_static_property(vcollect_application_ce, ZEND_STRL("instance"), 0);
 
 	if(Z_TYPE_P(instance) == IS_NULL) {
 
 	#ifdef FAST_ZPP
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &var_items) == FAILURE) {
-			return;
-		}
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &var_items) == FAILURE) {
+        return;
+    }
 	#else
-		ZEND_PARSE_PARAMETERS_START(1, 1)
-			Z_PARAM_ARRAY(&var_items)
-		ZEND_PARSE_PARAMETERS_END();
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+    Z_PARAM_ARRAY(&var_items)
+    ZEND_PARSE_PARAMETERS_END();
 	#endif
-
 		object_init_ex(instance, vcollect_application_ce);
-
         zend_update_static_property(vcollect_application_ce, ZEND_STRL("instance"), instance TSRMLS_CC);
-		zend_update_property(vcollect_application_ce, instance, ZEND_STRL("items"), var_items TSRMLS_CC);
+        zend_update_property(vcollect_application_ce, instance, ZEND_STRL("items"), var_items TSRMLS_CC);
 	} else {
-		RETURN_ZVAL(instance, 1, 0);
+        RETURN_ZVAL(instance, 1, 0);
 	}
 	RETURN_ZVAL(instance, 1, 0);
+
+    zval_ptr_dtor(instance);
 }
 
 PHP_METHOD(vcollect_application, map) {
-	zval *arrays = NULL;
-	zval *value;
-	zval args[2];
-	zval retval, map_retval;
-	zval rv;
+	zval *arrays = NULL, *value;
+	zval args[2], retval, map_retval, rv;
 	zend_ulong long_key;
     zend_string *str_key;
 	zend_fcall_info fci = empty_fcall_info;
 	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 	HashTable *htbl;
+
 	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
+
 	ZEND_PARSE_PARAMETERS_START(1, -1)
 		Z_PARAM_FUNC_EX(fci, fci_cache, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
+
 	htbl = Z_ARRVAL_P(arrays);
+
 	if (zend_hash_num_elements(htbl) == 0) {
-		return;
+		return ;
 	}
-	ZEND_HASH_FOREACH_KEY_VAL(htbl, long_key, str_key, value)
-	{
+
+	ZEND_HASH_FOREACH_KEY_VAL(htbl, long_key, str_key, value) {
 		fci.retval = &retval;
 		fci.param_count = 2;
 		fci.params = args;
 		fci.no_separation = 0;
-		if (str_key) {
-			ZVAL_STR_COPY(&args[0], str_key);
+
+		if(str_key) {
+            ZVAL_STR_COPY(&args[0], str_key);
 		} else {
 			ZVAL_LONG(&args[0], long_key);
 		}
+
 		ZVAL_COPY(&args[1], value);
 		if (zend_call_function(&fci, &fci_cache) == SUCCESS && Z_TYPE(retval) != IS_UNDEF) {
 			if(str_key) {
@@ -152,63 +155,62 @@ PHP_METHOD(vcollect_application, map) {
 }
 
 PHP_METHOD(vcollect_application, collapse) {
-	zval *items = NULL;
-	zval *value;
-	zval *valuea;
-	zval ret_val, retval;
-	zval temp;
-	zval rv;
-	HashTable *htbl;
-	HashTable *htbla;
-	zval *object;
-	array_init(&ret_val);
+	zval *items = NULL, *value, *valuea, *object;
+	zval retval, temp, rv;
+	HashTable *htbl, *htbla;
+
+	array_init(return_value);
 	items = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
 	htbl = Z_ARRVAL_P(items);
+
 	ZEND_HASH_FOREACH_VAL(htbl, value) {
-		if( Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) == IS_ARRAY ){
+        if(Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) == IS_ARRAY) {
 			htbla = Z_ARRVAL_P(value);
         	ZEND_HASH_FOREACH_VAL(htbla, valuea) {
         		ZVAL_COPY(&temp, valuea);
-        		add_next_index_zval(&ret_val, &temp);
+                zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &temp);
 			} ZEND_HASH_FOREACH_END();
     	} else {
     		ZVAL_COPY(&temp, value);
-        	add_next_index_zval(&ret_val, &temp);
+            zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &temp);
     	}
 	} ZEND_HASH_FOREACH_END();
-	zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &ret_val TSRMLS_CC);
-	ZVAL_COPY(&retval, getThis());
-	RETURN_ZVAL(&retval, 0, 0);
+
+    ZVAL_COPY(&retval, return_value);
+	zend_update_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), &retval TSRMLS_CC);
+
+    zval_ptr_dtor(return_value);
+    zval_ptr_dtor(items);
+
+	ZVAL_COPY(return_value, getThis());
 }
 
 PHP_METHOD(vcollect_application, avg) {
-	zval *arrays = NULL;
-	zval call_args[2];
-	zval *value;
-	zval rv;
-	zval call_result;
-	zval result;
-  	zval leng;
-  	zval sum;
+	zval *arrays = NULL, *value;
+	zval rv, result, leng, sum, function_array_sum, obj;
 	zend_string *args = NULL;
 	HashTable *htbl;
-  	long a,b;
+  	long a, b;
   	int num = 0;
   	double aa;
+
 	ZVAL_LONG(&leng, 0);
-	zval function_array_column;
-	zval function_array_sum;
-	ZVAL_STRING(&function_array_column, "array_column");
-	ZVAL_STRING(&function_array_sum, "array_sum");
+	ZVAL_STRING(&function_array_sum, ARRAYSUM);
+
 	ZEND_PARSE_PARAMETERS_START(0, 1)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_STR(args)
 	ZEND_PARSE_PARAMETERS_END();
-	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL("items"), 0, &rv TSRMLS_DC);
+
+	arrays = zend_read_property(vcollect_application_ce, getThis(), ZEND_STRL(ITEMS), 0, &rv TSRMLS_DC);
 	if (args != NULL) {
+        zval call_args[2], call_result, function_array_column;
+        ZVAL_STRING(&function_array_column, ARRAYCOLUMN);
+
 		ZVAL_COPY(&call_args[0], arrays);
 		ZVAL_STR_COPY(&call_args[1], args);
-		if (call_user_function(EG(function_table), NULL, &function_array_column, &call_result, 2, call_args) == FAILURE) {
+
+		if (call_user_function(NULL, NULL, &function_array_column, &call_result, 2, call_args) == FAILURE) {
 			zval_ptr_dtor(&call_args[1]);
 			zval_ptr_dtor(&call_args[0]);
 			zval_ptr_dtor(&call_result);
@@ -216,16 +218,24 @@ PHP_METHOD(vcollect_application, avg) {
 		} else if (Z_ISUNDEF(call_result)) {
 			ZVAL_NULL(&call_result);
 			zval_ptr_dtor(&call_args[1]);
-			zval_ptr_dtor(&call_args[0]);
+            zval_ptr_dtor(&call_args[0]);
 		}
+        zval_ptr_dtor(&function_array_column);
+        zval_ptr_dtor(&call_args[1]);
+        zval_ptr_dtor(&call_args[0]);
+
 	    if(Z_TYPE(call_result) == IS_ARRAY){
-	      if(call_user_function(EG(function_table), NULL, &function_array_sum, &sum, 1, &call_result) == FAILURE) {
-	        zval_ptr_dtor(&sum);
-	        ZVAL_UNDEF(&sum);
-	      }
+            if(call_user_function(NULL, NULL, &function_array_sum, &sum, 1, &call_result) == FAILURE) {
+                zval_ptr_dtor(&function_array_sum);
+                zval_ptr_dtor(&sum);
+                ZVAL_UNDEF(&sum);
+            }
 	    }
+        zval_ptr_dtor(&function_array_sum);
+
 	    if(Z_TYPE(sum) == IS_LONG) {
 	      ZVAL_LONG(&leng, zend_hash_num_elements(Z_ARRVAL_P(&call_result)));
+          zval_ptr_dtor(&call_result);
 	      a = Z_LVAL_P(&sum);
 	      b = Z_LVAL_P(&leng);
 	      if((((double)a/b) - (long)(a/b)) > 0) {
@@ -234,6 +244,7 @@ PHP_METHOD(vcollect_application, avg) {
 	      RETURN_LONG((a/b));
 	    } else if (Z_TYPE(sum) == IS_DOUBLE) {
 	      ZVAL_LONG(&leng, zend_hash_num_elements(Z_ARRVAL_P(&call_result)));
+          zval_ptr_dtor(&call_result);
 	      aa = Z_DVAL_P(&sum);
 	      b = Z_LVAL_P(&leng);
 	      RETURN_DOUBLE((aa/b));
@@ -241,29 +252,31 @@ PHP_METHOD(vcollect_application, avg) {
 	} else {
 		htbl = Z_ARRVAL_P(arrays);
 		ZEND_HASH_FOREACH_VAL(htbl, value) {
-			if( Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) == IS_ARRAY ){
-				continue;
-	    	} else {
-	    		num += 1;
+			if( Z_TYPE_P(value) == IS_LONG || Z_TYPE_P(value) == IS_DOUBLE ){
+				num += 1;
 	    	}
+            continue;
 		} ZEND_HASH_FOREACH_END();
-		if(call_user_function(EG(function_table), NULL, &function_array_sum, &sum, 1, arrays) == FAILURE) {
+		if(call_user_function(NULL, NULL, &function_array_sum, &sum, 1, arrays) == FAILURE) {
 	        zval_ptr_dtor(&sum);
+            zval_ptr_dtor(&function_array_sum);
 	        ZVAL_UNDEF(&sum);
 	    }
+        zval_ptr_dtor(&function_array_sum);
 	    if(Z_TYPE(sum) == IS_LONG) {
-	      ZVAL_LONG(&leng, zend_hash_num_elements(Z_ARRVAL_P(&call_result)));
 	      a = Z_LVAL_P(&sum);
 	      if((((double)a/num) - (long)(a/num)) > 0) {
 	      	RETURN_DOUBLE(((double)a/num));
 	      }
 	      RETURN_LONG((a/num));
 	    } else if (Z_TYPE(sum) == IS_DOUBLE) {
-	      ZVAL_LONG(&leng, zend_hash_num_elements(Z_ARRVAL_P(&call_result)));
 	      aa = Z_DVAL_P(&sum);
 	      RETURN_DOUBLE((aa/num));
 	    }
 	}
+
+    efree(&a); efree(&b); efree(&num); efree(&aa);
+    zval_ptr_dtor(arrays);
 }
 
 PHP_METHOD(vcollect_application, has) {
@@ -523,10 +536,10 @@ PHP_METHOD(vcollect_application, pluck) {
 			zval_ptr_dtor(&args[0]);
 			ZVAL_NULL(&result_all);
 		}
-  		
+
   		RETURN_ZVAL(&result_all, 0, 0);
   	}
-  	
+
 	RETURN_ZVAL(&result_val, 0, 0);
 }
 
@@ -565,7 +578,7 @@ PHP_METHOD(vcollect_application, where) {
 
  		v_explode(arg_key, &explode_retval);
  		HashTable *explode_htbl = Z_ARRVAL(explode_retval);
- 		
+
  		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), long_key, str_key, value) {
  			explode_no = 0;
  			Bucket *explode_bucket = &explode_htbl->arData[explode_no];
@@ -632,7 +645,7 @@ PHP_METHOD(vcollect_application, where) {
 
 	 				explode_no++;
  				}
- 				
+
  			}
  			ZVAL_NULL(&exists_retval);
 		} ZEND_HASH_FOREACH_END();

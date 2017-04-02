@@ -19,6 +19,10 @@
 #ifndef VCOLLECT_APPLICATION_H
 #define VCOLLECT_APPLICATION_H
 
+#define ITEMS "items"
+#define ARRAYCOLUMN "array_column"
+#define ARRAYSUM "array_sum"
+
 extern zend_class_entry *vcollect_application_ce;
 
 VCOLLECT_STARTUP_FUNCTION(application);
