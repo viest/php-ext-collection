@@ -8,11 +8,11 @@
 
 /**********************************************************\
  *                                                        *
- * php_vcollection.h                                      *
+ * vcollect_application.h                                 *
  *                                                        *
  *                                                        *
  * LastModified: Dec 15, 2016                             *
- * Author: Wang Jiexin <vikindev@outlook.com>             *
+ * Author: Jiexin Wang <vikindev@outlook.com>             *
  *                                                        *
 \**********************************************************/
 
@@ -22,6 +22,7 @@
 #define ITEMS "items"
 #define ARRAYCOLUMN "array_column"
 #define ARRAYSUM "array_sum"
+#define JSONEN "json_encode"
 
 extern zend_class_entry *vcollect_application_ce;
 

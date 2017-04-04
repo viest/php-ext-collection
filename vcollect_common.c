@@ -147,17 +147,14 @@ void __key_exists (zval *key, zval *array, zval *retval) {
 
   ZVAL_STRING(&key_exists, "array_key_exists");
   if (call_user_function(EG(function_table), NULL, &key_exists, retval, 2, arg) == FAILURE) {
-    zval_ptr_dtor(&arg[1]);
-    zval_ptr_dtor(&arg[0]);
-    zval_ptr_dtor(retval);
-    ZVAL_UNDEF(retval);
+      zval_ptr_dtor(retval);
+      ZVAL_UNDEF(retval);
   } else if (Z_ISUNDEF_P(retval)) {
-    zval_ptr_dtor(&arg[1]);
-    zval_ptr_dtor(&arg[0]);
-    ZVAL_NULL(retval);
+      ZVAL_NULL(retval);
   }
   zval_ptr_dtor(&arg[1]);
   zval_ptr_dtor(&arg[0]);
+  zval_ptr_dtor(&key_exists);
 }
 
 void __explode (zend_string *str_arg, zval *explode_retval) {
@@ -171,17 +168,15 @@ void __explode (zend_string *str_arg, zval *explode_retval) {
     ZVAL_STR_COPY(&args[1], str_arg);
 
     if (call_user_function(EG(function_table), NULL, &explode, explode_retval, 2, args) == FAILURE) {
-      zval_ptr_dtor(&args[1]);
-      zval_ptr_dtor(&args[0]);
       zval_ptr_dtor(explode_retval);
       ZVAL_UNDEF(explode_retval);
     } else if (Z_ISUNDEF_P(explode_retval)) {
-      zval_ptr_dtor(&args[1]);
-      zval_ptr_dtor(&args[0]);
       ZVAL_NULL(explode_retval);
     }
     zval_ptr_dtor(&args[1]);
     zval_ptr_dtor(&args[0]);
+    zval_ptr_dtor(&cut);
+    zval_ptr_dtor(&explode);
 }
 
 void __column (zval *array, zval *str_arg, zval *column_retval) {
@@ -194,7 +189,7 @@ void __column (zval *array, zval *str_arg, zval *column_retval) {
 
   if (call_user_function(EG(function_table), NULL, &column, column_retval, 2, args) == FAILURE) {
     zval_ptr_dtor(&args[1]);
-    zval_ptr_dtor(&args[0]);        
+    zval_ptr_dtor(&args[0]);
     zval_ptr_dtor(column_retval);
     ZVAL_UNDEF(column_retval);
   } else if (Z_ISUNDEF_P(column_retval)) {
@@ -216,17 +211,14 @@ void __strcmp (zend_string *op1, zend_string *op2, zval *retval) {
   STRCMP(&strcmp);
 
   if (call_user_function(EG(function_table), NULL, &strcmp, retval, 2, arg) == FAILURE) {
-    zval_ptr_dtor(&arg[1]);
-    zval_ptr_dtor(&arg[0]);        
     zval_ptr_dtor(retval);
     ZVAL_UNDEF(retval);
   } else if (Z_ISUNDEF_P(retval)) {
-    zval_ptr_dtor(&arg[1]);
-    zval_ptr_dtor(&arg[0]);
     ZVAL_NULL(retval);
   }
   zval_ptr_dtor(&arg[1]);
   zval_ptr_dtor(&arg[0]);
+  zval_ptr_dtor(&strcmp);
 }
 
 void __intval (zend_string *op1, zval *retval) {
@@ -237,7 +229,7 @@ void __intval (zend_string *op1, zval *retval) {
   ZVAL_STR_COPY(&arg[0], op1);
 
   if (call_user_function(EG(function_table), NULL, &intval, retval, 1, arg) == FAILURE) {
-    zval_ptr_dtor(&arg[0]);        
+    zval_ptr_dtor(&arg[0]);
     zval_ptr_dtor(retval);
     ZVAL_UNDEF(retval);
   } else if (Z_ISUNDEF_P(retval)) {
@@ -255,7 +247,7 @@ void __floatval (zend_string *op1, zval *retval) {
   ZVAL_STR_COPY(&arg[0], op1);
 
   if (call_user_function(EG(function_table), NULL, &floatval, retval, 1, arg) == FAILURE) {
-    zval_ptr_dtor(&arg[0]);        
+    zval_ptr_dtor(&arg[0]);
     zval_ptr_dtor(retval);
     ZVAL_UNDEF(retval);
   } else if (Z_ISUNDEF_P(retval)) {

@@ -50,7 +50,7 @@ PHP_FUNCTION(array_var)
 	zend_long count;
 	zend_ulong long_key, depth_long_key;
 	zend_array *symbol_table;
-  zend_string *str_key, *depth_str_key;
+  	zend_string *str_key, *depth_str_key;
 
 	#ifdef FAST_ZPP
 		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "aa", &key_data, &val_data) == FAILURE) {
