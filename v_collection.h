@@ -8,7 +8,7 @@
 
 /**********************************************************\
  *                                                        *
- * vcollect_application.h                                 *
+ * v_collection.h                                         *
  *                                                        *
  *                                                        *
  * LastModified: Dec 15, 2016                             *
@@ -16,8 +16,8 @@
  *                                                        *
 \**********************************************************/
 
-#ifndef VCOLLECT_APPLICATION_H
-#define VCOLLECT_APPLICATION_H
+#ifndef V_COLLECTION_H
+#define V_COLLECTION_H
 
 #define ITEMS "items"
 #define ARRAYCOLUMN "array_column"

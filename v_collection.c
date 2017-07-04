@@ -8,7 +8,7 @@
 
 /**********************************************************\
  *                                                        *
- * vcollect_application.c                                 *
+ * v_collection.c                                         *
  *                                                        *
  *                                                        *
  * LastModified: Dec 18, 2016                             *
@@ -26,7 +26,7 @@
 #include "ext/standard/basic_functions.h"
 #include "ext/standard/php_var.h"
 #include "php_vcollect.h"
-#include "vcollect_application.h"
+#include "v_collection.h"
 #include "vcollect_common.h"
 
 #include "zend.h"
