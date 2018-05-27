@@ -11,7 +11,7 @@
 */
 
 #include "include.h"
-#include "depend/src/php/classes/php_collection_ce.h"
+#include "../dep/src/php/classes/php_collection_ce.h"
 
 static zend_object_handlers collection_handlers;
 
