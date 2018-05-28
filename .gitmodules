@@ -1,4 +1,0 @@
-[submodule "dep"]
-	path = dep
-	url = https://github.com/php-ds/extension
-	branch = master

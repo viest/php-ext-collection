@@ -26,36 +26,34 @@
 extern zend_class_entry *vtiful_collection_ce;
 extern zend_class_entry *vtiful_collection_exception_ce;
 
-//#define NEW_NULL_PROPERTIES_COLLECTION(class_name)            \
-//    do {                                                      \
-//        zend_object *intern = ecalloc(1, sizeof(zend_object) + zend_object_properties_size(class_name)); \
-//        zend_object_std_init(intern, class_name); \
-//        object_properties_init(intern, class_name); \
-//        intern->handlers = &collection_handlers; \
-//    } while(0)
-//
-//#define NEW_COLLECTION_OBJECT(class_name, properties_array)   \
-//    do {                                                      \
-//        zend_object *intern = ecalloc(1, sizeof(zend_object) + zend_object_properties_size(class_name)); \
-//        zend_object_std_init(intern, class_name); \
-//        object_properties_init(intern, class_name); \
-//        intern->handlers = &collection_handlers; \
-//        zo->properties  = properties_array;\
-//    } while(0)
-
-
 // Startup Module
 COLLECTION_STARTUP_FUNCTION(exception);
 COLLECTION_STARTUP_FUNCTION(kernel);
 
 // Kernel Class Method
-PHP_METHOD(collection, __construct);
-PHP_METHOD(collection, init);
-PHP_METHOD(collection, clear);
-PHP_METHOD(collection, copy);
-PHP_METHOD(collection, count);
-PHP_METHOD(collection, isEmpty);
-PHP_METHOD(collection, jsonSerialize);
-PHP_METHOD(collection, toArray);
+PHP_METHOD(vtiful_collection, __construct);
+PHP_METHOD(vtiful_collection, __clone);
+PHP_METHOD(vtiful_collection, init);
+PHP_METHOD(vtiful_collection, map);
+PHP_METHOD(vtiful_collection, count);
+PHP_METHOD(vtiful_collection, toArray);
+
+// Define
+#define CURRENT_COLLECTION Z_OBJ_P(getThis())->properties
+
+#define INIT_FCALL(arg_num)          \
+        zval args[arg_num], ret_val; \
+        fci.param_count = arg_num;   \
+        fci.retval      = &ret_val;  \
+        fci.params      = args;
+
+#define FCALL_TWO_ARGS(bucket)                   \
+        ZVAL_COPY_VALUE(&args[0], &bucket->val); \
+        if (bucket->key) {                       \
+            ZVAL_STR(&args[1], bucket->key);     \
+        } else {                                 \
+            ZVAL_LONG(&args[1], bucket->h);      \
+        }                                        \
+        zend_call_function(&fci, &fci_cache);    \
 
 #endif

@@ -82,20 +82,10 @@ const zend_function_entry collection_functions[] = {
 };
 /* }}} */
 
-/* {{{ collection_deps[]
- */
-static const zend_module_dep collection_deps[] = { /* {{{ */
-        ZEND_MOD_REQUIRED("ds")
-        ZEND_MOD_END
-};
-/* }}} */
-
 /* {{{ collection_module_entry
  */
 zend_module_entry collection_module_entry = {
-        STANDARD_MODULE_HEADER_EX,
-        NULL,
-        collection_deps,
+        STANDARD_MODULE_HEADER,
 		"collection",
 		collection_functions,
 		PHP_MINIT(collection),
