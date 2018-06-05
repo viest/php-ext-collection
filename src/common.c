@@ -43,6 +43,8 @@ double average_column(zend_array *current, zend_string *column)
         sum = average_no_column(Z_ARRVAL(ret_val));
     }
 
+    zval_ptr_dtor(&ret_val);
+
     return sum;
 }
 
@@ -56,6 +58,8 @@ void collection_chunk(zend_array *current, zend_long length, zval *object)
     call_internal_function(INTERNAL_FUN(chunk), 2, args, &ret_val);
 
     UPDATE_OBJ_COLLECTION(object, &ret_val);
+
+    zval_ptr_dtor(&ret_val);
 }
 
 void collection_collapse(zend_array *z_array_p, zval *ret_val)

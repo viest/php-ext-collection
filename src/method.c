@@ -73,6 +73,8 @@ PHP_METHOD(vtiful_collection, map)
  */
 PHP_METHOD(vtiful_collection, all)
 {
+    GC_ADDREF(CURRENT_COLLECTION);
+
     ZVAL_ARR(return_value, CURRENT_COLLECTION);
 }
 /* }}} */
