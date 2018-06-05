@@ -5,25 +5,19 @@ Check Collection operations
 --FILE--
 <?php 
 $collection = \Vtiful\Kernel\Collection::init([
-    1, 2, 3, 4, 5
+    1, 2, 3, 4, 5, 6, 7, 8, 9
 ]);
 
-$result = $collection->all();
+$chunk = $collection->forPage(2, 3);
 
-var_dump($result);
+var_dump($chunk);
 ?>
 --EXPECT--
-array(5) {
+object(Vtiful\Kernel\Collection)#2 (3) {
   [0]=>
-  int(1)
-  [1]=>
-  int(2)
-  [2]=>
-  int(3)
-  [3]=>
   int(4)
-  [4]=>
+  [1]=>
   int(5)
+  [2]=>
+  int(6)
 }
-
-

@@ -48,7 +48,7 @@ PHP_METHOD(vtiful_collection, init)
  */
 PHP_METHOD(vtiful_collection, map)
 {
-    zval fcall_result;
+    zval fcall_result, result;
     zend_fcall_info       fci       = empty_fcall_info;
     zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 
@@ -58,9 +58,14 @@ PHP_METHOD(vtiful_collection, map)
 
     INIT_FCALL(2, &fcall_result)
 
+    COLLECTION_INIT(&result);
+
     ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket* bucket)
-            FCALL_TWO_ARGS(bucket)
+        FCALL_TWO_ARGS(bucket)
+        COLLECTION_ADD_INDEX_ZVAL(&result, &fcall_result)
     ZEND_HASH_FOREACH_END();
+
+    NEW_COLLECTION_OBJ(return_value, &result);
 }
 /* }}} */
 
@@ -353,7 +358,7 @@ PHP_METHOD(vtiful_collection, first)
 /* }}} */
 
 
-/** {{{ \Vtiful\Kernel\Collection::firstWhere([closures $callback])
+/** {{{ \Vtiful\Kernel\Collection::firstWhere(mixed $column, mixed $val)
  */
 PHP_METHOD(vtiful_collection, firstWhere)
 {
@@ -373,7 +378,9 @@ PHP_METHOD(vtiful_collection, firstWhere)
         zval zval_zstr;
 
         ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION,  zval *value)
-            find_res = zend_hash_find(Z_ARR_P(value), column);
+            ZVAL_IS_NOT_ARRAY_SO_CONTINUE(value)
+
+            ARRAY_STR_FIND(value, column, find_res);
 
             if (find_res != NULL) {
                 ZVAL_STR(&zval_zstr, val);
@@ -385,7 +392,9 @@ PHP_METHOD(vtiful_collection, firstWhere)
         ZEND_HASH_FOREACH_END();
     } else if (ZEND_NUM_ARGS() == 3) {
         ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *value)
-            find_res = zend_hash_find(Z_ARR_P(value), column);
+            ZVAL_IS_NOT_ARRAY_SO_CONTINUE(value)
+
+            ARRAY_STR_FIND(value, column, find_res);
 
             if (find_res != NULL) {
                 if (zval_comparison_operations(val, find_res, symbol)) {
@@ -399,3 +408,169 @@ PHP_METHOD(vtiful_collection, firstWhere)
     NEW_COLLECTION_OBJ(return_value, &result);
 }
 /* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::flatMap(closures $callback)
+ */
+PHP_METHOD(vtiful_collection, flatMap)
+{
+    zval fcall_result, result;
+    zend_fcall_info       fci       = empty_fcall_info;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            Z_PARAM_FUNC(fci, fci_cache)
+    ZEND_PARSE_PARAMETERS_END();
+
+    INIT_FCALL(1, &fcall_result);
+
+    COLLECTION_INIT_IN_CURRENT(&result);
+
+    ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
+        FCALL_ONE_ARGS(bucket);
+        COLLECTION_UPDATE(&result, bucket, &fcall_result);
+    ZEND_HASH_FOREACH_END();
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::flatten([int $depth])
+ */
+PHP_METHOD(vtiful_collection, flatten)
+{
+    zval result;
+    zend_long depth = 1;
+
+    ZEND_PARSE_PARAMETERS_START(0, 1)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_LONG(depth)
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT(&result);
+
+    collection_flatten(CURRENT_COLLECTION, depth, &result);
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::flip()
+ */
+PHP_METHOD(vtiful_collection, flip)
+{
+    zval result;
+
+    collection_flip(CURRENT_COLLECTION, &result);
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::forget(string $key)
+ */
+PHP_METHOD(vtiful_collection, forget)
+{
+    zend_string *key = NULL;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            Z_PARAM_STR(key)
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_DELETE(CURRENT_COLLECTION, key);
+
+    RETURN_THIS
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::forPage(int $page, int $number)
+ */
+PHP_METHOD(vtiful_collection, forPage)
+{
+    zval result;
+    zend_long page, number;
+
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+            Z_PARAM_LONG(page)
+            Z_PARAM_LONG(number)
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT(&result);
+
+    collection_for_page(CURRENT_COLLECTION, page, number, &result);
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::get(mixed $key, mixed $default)
+ */
+PHP_METHOD(vtiful_collection, get)
+{
+    zval *key, *default_val = NULL, *find_result = NULL;
+    
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+        Z_PARAM_ZVAL(key)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_ZVAL(default_val)
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (Z_TYPE_P(key) == IS_LONG) {
+        COLLECTION_INDEX_FIND(CURRENT_COLLECTION, Z_LVAL_P(key), find_result);
+    }
+
+    if (Z_TYPE_P(key) == IS_STRING) {
+        COLLECTION_STR_FIND(CURRENT_COLLECTION, Z_STR_P(key), find_result);
+    }
+
+    if (Z_TYPE_P(find_result) == IS_NULL || find_result == NULL) {
+        if (ZEND_NUM_ARGS() < 2) {
+            ZVAL_NULL(return_value);
+        } else {
+            ZVAL_COPY(return_value, default_val);
+        }
+    } else {
+        ZVAL_COPY(return_value, find_result);
+    }
+}
+/* }}} */
+
+PHP_METHOD(vtiful_collection, groupBy)
+{
+    zval result;
+
+    zend_string *key = NULL;
+
+    zend_fcall_info       fci       = empty_fcall_info;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            _real_arg++;
+            if (Z_TYPE_P(_real_arg) == IS_STRING) {
+                _real_arg--;
+                Z_PARAM_STR(key);
+            }
+            if (Z_TYPE_P(_real_arg) == IS_OBJECT) {
+                _real_arg--;
+                Z_PARAM_FUNC(fci, fci_cache);
+            }
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT(&result);
+
+    if (key == NULL) {
+        zval fcall_res;
+
+        INIT_FCALL(2, &fcall_res);
+
+        ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
+            FCALL_TWO_ARGS(bucket);
+            collection_group(&(bucket->val), return_value, NULL, &fcall_res, &result);
+        ZEND_HASH_FOREACH_END();
+    } else {
+        ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *value)
+            collection_group(value, return_value, key, NULL, &result);
+        ZEND_HASH_FOREACH_END();
+    }
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+}

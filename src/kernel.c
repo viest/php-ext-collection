@@ -70,6 +70,32 @@ ZEND_BEGIN_ARG_INFO_EX(collection_first_where_arginfo, 0, 0, 2)
                 ZEND_ARG_INFO(0, val)
                 ZEND_ARG_INFO(0, symbol)
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_flat_map_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, callback)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_flatten_arginfo, 0, 0, 0)
+                ZEND_ARG_INFO(0, callback)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_forget_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_for_page_arginfo, 0, 0, 2)
+                ZEND_ARG_INFO(0, page)
+                ZEND_ARG_INFO(0, number)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_get_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+                ZEND_ARG_INFO(0, default_val)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_group_by_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
 /* }}} */
 
 /** {{{ collection_methods
@@ -95,6 +121,13 @@ zend_function_entry collection_methods[] = {
         PHP_ME(vtiful_collection, filter,        collection_filter_arginfo,      ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, first,         collection_first_arginfo,       ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, firstWhere,    collection_first_where_arginfo, ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, flatMap,       collection_flat_map_arginfo,    ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, flatten,       collection_flatten_arginfo,     ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, flip,          NULL,                           ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, forget,        collection_forget_arginfo,      ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, forPage,       collection_for_page_arginfo,    ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, get,           collection_get_arginfo,         ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, groupBy,       collection_group_by_arginfo,    ZEND_ACC_PUBLIC)
         PHP_FE_END
 };
 /* }}} */

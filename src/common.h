@@ -38,5 +38,9 @@ void   collection_in_array_kv(zend_array *current_collection, zval *search_key, 
 void   collection_diff(zend_array *current_collection, zval *search_val, zval *ret_val);
 void   collection_diff_assoc(zend_array *current_collection, zval *search_val, zval *ret_val);
 void   collection_except(zend_array *current_collection, zval *excluded_keys, zval *ret_val);
+void   collection_flatten(zend_array *current_collection, zend_long depth, zval *ret_val);
+void   collection_flip(zend_array *current_collection, zval *ret_val);
+void   collection_for_page(zend_array *current_collection, zend_long page, zend_long number, zval *ret_val);
+void   collection_group(zval *foreach_val, zval *tmp, zend_string *group_by_where, zval *group_key, zval *result);
 
 #endif

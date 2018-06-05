@@ -201,6 +201,65 @@ void collection_except(zend_array *current_collection, zval *excluded_keys, zval
     ZEND_HASH_FOREACH_END();
 }
 
+void collection_flatten(zend_array *current_collection, zend_long depth, zval *ret_val)
+{
+    ZEND_HASH_FOREACH_VAL(current_collection, zval *val)
+        if (Z_TYPE_P(val) == IS_ARRAY && depth > 0) {
+            collection_flatten(Z_ARR_P(val), depth - 1, ret_val);
+        } else {
+            add_next_index_zval(ret_val, val);
+        }
+    ZEND_HASH_FOREACH_END();
+}
+
+void collection_flip(zend_array *current_collection, zval *ret_val)
+{
+    zval args[1];
+
+    ZVAL_ARR(&args[0], current_collection);
+
+    call_internal_function(INTERNAL_FUN(flip), 1, args, ret_val);
+}
+
+void collection_for_page(zend_array *current_collection, zend_long page, zend_long number, zval *ret_val)
+{
+    int64_t start_index;
+    int64_t end_index = page * number;
+
+    for (start_index = end_index - number; start_index < end_index; ++start_index) {
+        add_next_index_zval(ret_val, &(current_collection->arData[start_index].val));
+
+    }
+}
+
+void collection_group(zval *foreach_val, zval *tmp, zend_string *group_by_where, zval *group_key, zval *result)
+{
+    if (Z_TYPE_P(foreach_val) == IS_ARRAY) {
+        zval *group_current_list = NULL, *_group_key = NULL;
+
+        if (group_key != NULL) {
+            _group_key = group_key;
+        }
+
+        if (group_by_where != NULL) {
+            COLLECTION_STR_FIND(Z_ARR_P(foreach_val), group_by_where, _group_key);
+        }
+
+        COLLECTION_STR_FIND(Z_ARR_P(result), Z_STR_P(_group_key), group_current_list);
+
+        GC_ZVAL_ADDREF(foreach_val);
+
+        if (group_current_list == NULL) {
+            COLLECTION_INIT(tmp);
+            add_next_index_zval(tmp, foreach_val);
+            zend_hash_add(Z_ARRVAL_P(result), Z_STR_P(_group_key), tmp);
+            ZVAL_NULL(tmp);
+        } else {
+            add_next_index_zval(group_current_list, foreach_val);
+        }
+    }
+}
+
 int zval_comparison_operations(zend_string *operator, zval *left, zval *right)
 {
     if (strcmp(operator->val, "==") == 0) {

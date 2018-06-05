@@ -5,25 +5,19 @@ Check Collection operations
 --FILE--
 <?php 
 $collection = \Vtiful\Kernel\Collection::init([
-    1, 2, 3, 4, 5
+    'name' => 'viest',
+    'extension' => 'collection'
 ]);
 
-$result = $collection->all();
+$result = $collection->forget('name');
 
 var_dump($result);
 ?>
 --EXPECT--
-array(5) {
-  [0]=>
-  int(1)
-  [1]=>
-  int(2)
-  [2]=>
-  int(3)
-  [3]=>
-  int(4)
-  [4]=>
-  int(5)
+object(Vtiful\Kernel\Collection)#1 (1) {
+  ["extension"]=>
+  string(10) "collection"
 }
+
 
 

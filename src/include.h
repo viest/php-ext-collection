@@ -54,6 +54,13 @@ PHP_METHOD(vtiful_collection, except);
 PHP_METHOD(vtiful_collection, filter);
 PHP_METHOD(vtiful_collection, first);
 PHP_METHOD(vtiful_collection, firstWhere);
+PHP_METHOD(vtiful_collection, flatMap);
+PHP_METHOD(vtiful_collection, flatten);
+PHP_METHOD(vtiful_collection, flip);
+PHP_METHOD(vtiful_collection, forget);
+PHP_METHOD(vtiful_collection, forPage);
+PHP_METHOD(vtiful_collection, get);
+PHP_METHOD(vtiful_collection, groupBy);
 
 // PHP Compatible
 #ifndef GC_ADDREF
@@ -99,6 +106,20 @@ PHP_METHOD(vtiful_collection, firstWhere);
             array_init(zval_p); \
         } while (0)
 
+#define COLLECTION_ADD_INDEX_ZVAL(collection_zval_p, zval_p) \
+        add_next_index_zval(collection_zval_p, zval_p);
+
+#define COLLECTION_DELETE(collection_array_p, zs_key) \
+        zend_hash_del(collection_array_p, zs_key);
+
+#define COLLECTION_INIT_IN_CURRENT(zval_p)      \
+        COLLECTION_INIT(zval_p);                \
+        (zval_p)->value.arr = CURRENT_COLLECTION
+
+
+
+#define COLLECTION_UPDATE(array_p, bucket, new_zval_p) \
+        ZVAL_COPY_VALUE(&(Z_ARR_P(array_p)->arData[bucket->h].val), new_zval_p)
 
 #define NEW_ZVAL_OBJ(zval_p)                              \
         do {                                              \
@@ -135,23 +156,51 @@ PHP_METHOD(vtiful_collection, firstWhere);
         }                                        \
         zend_call_function(&fci, &fci_cache);
 
-#define ZVAL_ARRAY_FIND(zval_p, index, zval_result_p)          \
-    do {                                                       \
-        zval_result_p = &(Z_ARR_P(zval_p)->arData[index].val); \
-    } while (0)
+#define FCALL_ONE_ARGS(bucket) \
+        ZVAL_COPY_VALUE(&args[0], &bucket->val); \
+        zend_call_function(&fci, &fci_cache);
 
+#define ARRAY_INDEX_FIND(zval_p, index, zval_result_p)             \
+        do {                                                       \
+            zval_result_p = &(Z_ARR_P(zval_p)->arData[index].val); \
+        } while (0)
 
-#define ZVAL_ARRAY_INSERT_BUCKET_KEY_ZVAL_VAL(zval_p, bucket, zval_val_p)                                   \
-    do {                                                                                                    \
-        zval *value = NULL;                                                                                 \
-        if (Z_TYPE(bucket->val) == IS_STRING) {                                                             \
-            ZVAL_ARRAY_FIND(z_arr_val, bucket->h, value);                                                   \
-            zend_hash_str_update(Z_ARRVAL_P(ret_val), Z_STRVAL(bucket->val), Z_STRLEN(bucket->val), value); \
-        }                                                                                                   \
-        if (Z_TYPE(bucket->val) == IS_LONG) {                                                               \
-            ZVAL_ARRAY_FIND(z_arr_val, bucket->h, value);                                                   \
-            zend_hash_index_update(Z_ARRVAL_P(ret_val), Z_LVAL(bucket->val), value);                        \
-        }                                                                                                   \
-    } while(0)
+#define ARRAY_STR_FIND(zval_p, zs_key_p, zval_result_p)                \
+        do {                                                           \
+            zval_result_p = zend_hash_find(Z_ARR_P(zval_p), zs_key_p); \
+        } while (0)
+
+#define COLLECTION_INDEX_FIND(collection, index, zval_result_p)   \
+        do {                                                      \
+            if (index < CURRENT_COLLECTION->nNumOfElements) {     \
+                zval_result_p = &(collection->arData[index].val); \
+            } else {                                              \
+                ZVAL_NULL(zval_result_p);                         \
+            }                                                     \
+        } while (0)
+
+#define COLLECTION_STR_FIND(collection, zs_key_p, zval_result_p)  \
+        do {                                                      \
+            zval_result_p = zend_hash_find(collection, zs_key_p); \
+        } while (0)
+
+#define ZVAL_ARRAY_INSERT_BUCKET_KEY_ZVAL_VAL(zval_p, bucket, zval_val_p)                                       \
+        do {                                                                                                    \
+            zval *value = NULL;                                                                                 \
+            if (Z_TYPE(bucket->val) == IS_STRING) {                                                             \
+                ARRAY_INDEX_FIND(z_arr_val, bucket->h, value);                                                   \
+                zend_hash_str_update(Z_ARRVAL_P(ret_val), Z_STRVAL(bucket->val), Z_STRLEN(bucket->val), value); \
+            }                                                                                                   \
+            if (Z_TYPE(bucket->val) == IS_LONG) {                                                               \
+                ARRAY_INDEX_FIND(z_arr_val, bucket->h, value);                                                   \
+                zend_hash_index_update(Z_ARRVAL_P(ret_val), Z_LVAL(bucket->val), value);                        \
+            }                                                                                                   \
+        } while(0)
+
+#define ZVAL_IS_NOT_ARRAY_SO_CONTINUE(zval_p) \
+        if (Z_TYPE_P(value) != IS_ARRAY) continue;
+
+#define RETURN_THIS \
+        ZVAL_COPY(return_value, getThis());
 
 #endif
