@@ -1,6 +1,10 @@
-PHP_ARG_WITH(vcollect, for vcollect support,
-[  --with-vcollect             Include vcollect support])
+PHP_ARG_WITH(collection, for collection support,
+[  --with-collection             Include collection support])
 
-if test "$PHP_VCOLLECT" != "no"; then
-  PHP_NEW_EXTENSION(vcollect, vcollect_application.c vcollect_common.c vcollect.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+if test "$PHP_COLLECTION" != "no"; then
+  PHP_ADD_EXTENSION_DEP(collection, ds)
+
+  PHP_NEW_EXTENSION(collection, collection.c src/kernel.c src/method.c src/exception.c src/common.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+
+  PHP_ADD_BUILD_DIR([$ext_builddir/src])
 fi
