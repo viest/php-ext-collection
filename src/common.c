@@ -86,11 +86,10 @@ void collection_combine(zend_array *current_collection, zval *z_arr_val, zval *r
 
 void collection_concat(zend_array *current_collection, zval *z_arr, zval *ret_val)
 {
-    GC_REFCOUNT_IS_ONE_SO_ADD(GC_REFCOUNT(current_collection), current_collection);
+    zend_hash_copy(Z_ARRVAL_P(ret_val), current_collection, zval_add_ref);
 
-    Z_ARR_P(ret_val) = current_collection;
-
-    ZEND_HASH_FOREACH_VAL(Z_ARR_P(z_arr), zval *val)
+    ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(z_arr), zval *val)
+        GC_ZVAL_ADDREF(val);
         add_next_index_zval(ret_val, val);
     ZEND_HASH_FOREACH_END();
 }

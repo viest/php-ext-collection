@@ -133,6 +133,8 @@ PHP_METHOD(vtiful_collection, collapse)
     collection_collapse(CURRENT_COLLECTION, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -149,6 +151,8 @@ PHP_METHOD(vtiful_collection, count)
 PHP_METHOD(vtiful_collection, toArray)
 {
     ZVAL_ARR(return_value, CURRENT_COLLECTION);
+    
+    GC_ZVAL_ADDREF(return_value);
 }
 /* }}} */
 
@@ -167,6 +171,8 @@ PHP_METHOD(vtiful_collection, combine)
     collection_combine(CURRENT_COLLECTION, val, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -185,6 +191,8 @@ PHP_METHOD(vtiful_collection, concat)
     collection_concat(CURRENT_COLLECTION, val, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
