@@ -171,6 +171,8 @@ void collection_diff(zend_array *current_collection, zval *search_val, zval *ret
     ZVAL_ARR (&args[0], current_collection);
     ZVAL_COPY(&args[1], search_val);
 
+    GC_ZVAL_ADDREF(&args[0]);
+
     call_internal_function(INTERNAL_FUN(diff), 2, args, ret_val);
 }
 
@@ -181,15 +183,14 @@ void collection_diff_assoc(zend_array *current_collection, zval *search_val, zva
     ZVAL_ARR (&args[0], current_collection);
     ZVAL_COPY(&args[1], search_val);
 
+    GC_ZVAL_ADDREF(&args[0]);
+
     call_internal_function(INTERNAL_FUN(diff_assoc), 2, args, ret_val);
 }
 
 void collection_except(zend_array *current_collection, zval *excluded_keys, zval *ret_val)
 {
-    array_init_size(ret_val, current_collection->nNumOfElements);
-
-    // TODO 此处应该检查 current_collection 的引用计数
-    ret_val->value.arr = current_collection;
+    zend_hash_copy(Z_ARR_P(ret_val), current_collection, zval_add_ref);
 
     ZEND_HASH_FOREACH_VAL(Z_ARR_P(excluded_keys), zval *val)
         if (Z_TYPE_P(val) == IS_LONG) {
@@ -356,13 +357,22 @@ int zval_comparison_operations(zend_string *operator, zval *left, zval *right)
     return 0;
 }
 
-void call_internal_function(const char *function_name, uint32_t param_count, zval params[], zval *ret_val)
+void call_internal_function(const char *function_name, uint32_t param_count, zval *params, zval *ret_val)
 {
+    int index;
     zval z_f_name;
 
     ZVAL_STRINGL(&z_f_name, function_name, strlen(function_name));
 
     call_user_function(EG(function_table), NULL, &z_f_name, ret_val, param_count, params);
 
-    zval_ptr_dtor(&z_f_name);
+    if (Z_ISUNDEF_P(ret_val)) {
+        ZVAL_NULL(ret_val);
+    }
+
+    for (index = 0; index < (int)param_count; index++) {
+        VC_ZVAL_DTOR(params[index]);
+    }
+
+    VC_ZVAL_DTOR(z_f_name);
 }

@@ -151,7 +151,7 @@ PHP_METHOD(vtiful_collection, count)
 PHP_METHOD(vtiful_collection, toArray)
 {
     ZVAL_ARR(return_value, CURRENT_COLLECTION);
-    
+
     GC_ZVAL_ADDREF(return_value);
 }
 /* }}} */
@@ -226,11 +226,11 @@ PHP_METHOD(vtiful_collection, diff)
             Z_PARAM_ARRAY(val)
     ZEND_PARSE_PARAMETERS_END();
 
-    COLLECTION_INIT(&result);
-
     collection_diff(CURRENT_COLLECTION, val, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -244,11 +244,11 @@ PHP_METHOD(vtiful_collection, diffAssoc)
             Z_PARAM_ARRAY(val)
     ZEND_PARSE_PARAMETERS_END();
 
-    COLLECTION_INIT(&result);
-
     collection_diff_assoc(CURRENT_COLLECTION, val, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -294,6 +294,8 @@ PHP_METHOD(vtiful_collection, except)
     collection_except(CURRENT_COLLECTION, excluded_keys, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -333,6 +335,8 @@ PHP_METHOD(vtiful_collection, filter)
     }
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -382,8 +386,6 @@ PHP_METHOD(vtiful_collection, firstWhere)
         Z_PARAM_ZVAL(symbol)
     ZEND_PARSE_PARAMETERS_END();
 
-    COLLECTION_INIT(&result);
-
     if (ZEND_NUM_ARGS() == 2) {
         zval zval_zstr;
 
@@ -400,6 +402,8 @@ PHP_METHOD(vtiful_collection, firstWhere)
                 }
             }
         ZEND_HASH_FOREACH_END();
+
+        VC_ZVAL_DTOR(zval_zstr);
     } else if (ZEND_NUM_ARGS() == 3) {
         ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *value)
             ZVAL_IS_NOT_ARRAY_SO_CONTINUE(value)
@@ -416,6 +420,8 @@ PHP_METHOD(vtiful_collection, firstWhere)
     }
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
