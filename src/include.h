@@ -67,15 +67,6 @@ PHP_METHOD(vtiful_collection, groupBy);
 #define GC_ADDREF(p) ++(&(p->gc))->refcount
 #endif
 
-// GC
-#define GC_REFCOUNT_IS_ONE_SO_ADD(refcount, val_p) \
-    do {                                           \
-        if (refcount == 1) {                       \
-            GC_ADDREF(val_p);                      \
-        }                                          \
-    } while (0)
-
-
 #define GC_ZVAL_ADDREF(zval_p)                                      \
     do {                                                            \
         zend_refcounted *gc = Z_COUNTED_P(zval_p);                  \
