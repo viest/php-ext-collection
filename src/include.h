@@ -108,11 +108,9 @@ PHP_METHOD(vtiful_collection, groupBy);
 #define COLLECTION_DELETE(collection_array_p, zs_key) \
         zend_hash_del(collection_array_p, zs_key);
 
-#define COLLECTION_INIT_IN_CURRENT(zval_p)      \
-        COLLECTION_INIT(zval_p);                \
-        (zval_p)->value.arr = CURRENT_COLLECTION
-
-
+#define COLLECTION_INIT_IN_CURRENT(zval_p) \
+        COLLECTION_INIT(zval_p);           \
+        zend_hash_copy(Z_ARR_P(zval_p), CURRENT_COLLECTION, zval_add_ref);
 
 #define COLLECTION_UPDATE(array_p, bucket, new_zval_p) \
         ZVAL_COPY_VALUE(&(Z_ARR_P(array_p)->arData[bucket->h].val), new_zval_p)
@@ -140,6 +138,12 @@ PHP_METHOD(vtiful_collection, groupBy);
         fci.param_count = arg_num;     \
         fci.retval      = ret_val_p;   \
         fci.params      = args;
+
+#define FCALL_DTOR(arg_num)         \
+        int i = 0;                  \
+        for (i; i < arg_num; i++) { \
+            VC_ZVAL_DTOR(args[i])   \
+        }
 
 #define FCALL_TWO_ARGS(bucket)                   \
         ZVAL_COPY_VALUE(&args[0], &bucket->val); \
