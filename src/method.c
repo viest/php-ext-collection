@@ -66,6 +66,8 @@ PHP_METHOD(vtiful_collection, map)
     ZEND_HASH_FOREACH_END();
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -444,9 +446,12 @@ PHP_METHOD(vtiful_collection, flatMap)
     ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
         FCALL_ONE_ARGS(bucket);
         COLLECTION_UPDATE(&result, bucket, &fcall_result);
+        FCALL_DTOR(1);
     ZEND_HASH_FOREACH_END();
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -467,6 +472,8 @@ PHP_METHOD(vtiful_collection, flatten)
     collection_flatten(CURRENT_COLLECTION, depth, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -479,6 +486,8 @@ PHP_METHOD(vtiful_collection, flip)
     collection_flip(CURRENT_COLLECTION, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
@@ -515,10 +524,12 @@ PHP_METHOD(vtiful_collection, forPage)
     collection_for_page(CURRENT_COLLECTION, page, number, &result);
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }
 /* }}} */
 
-/** {{{ \Vtiful\Kernel\Collection::get(mixed $key, mixed $default)
+/** {{{ \Vtiful\Kernel\Collection::get(mixed $key [, mixed $default])
  */
 PHP_METHOD(vtiful_collection, get)
 {
@@ -538,7 +549,7 @@ PHP_METHOD(vtiful_collection, get)
         COLLECTION_STR_FIND(CURRENT_COLLECTION, Z_STR_P(key), find_result);
     }
 
-    if (Z_TYPE_P(find_result) == IS_NULL || find_result == NULL) {
+    if (find_result == NULL || Z_TYPE_P(find_result) == IS_NULL) {
         if (ZEND_NUM_ARGS() < 2) {
             ZVAL_NULL(return_value);
         } else {
@@ -560,15 +571,15 @@ PHP_METHOD(vtiful_collection, groupBy)
     zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 
     ZEND_PARSE_PARAMETERS_START(1, 1)
-            _real_arg++;
-            if (Z_TYPE_P(_real_arg) == IS_STRING) {
-                _real_arg--;
-                Z_PARAM_STR(key);
-            }
-            if (Z_TYPE_P(_real_arg) == IS_OBJECT) {
-                _real_arg--;
-                Z_PARAM_FUNC(fci, fci_cache);
-            }
+        _real_arg++;
+        if (Z_TYPE_P(_real_arg) == IS_STRING) {
+            _real_arg--;
+            Z_PARAM_STR(key);
+        }
+        if (Z_TYPE_P(_real_arg) == IS_OBJECT) {
+            _real_arg--;
+            Z_PARAM_FUNC(fci, fci_cache);
+        }
     ZEND_PARSE_PARAMETERS_END();
 
     COLLECTION_INIT(&result);
@@ -581,6 +592,7 @@ PHP_METHOD(vtiful_collection, groupBy)
         ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
             FCALL_TWO_ARGS(bucket);
             collection_group(&(bucket->val), return_value, NULL, &fcall_res, &result);
+            VC_ZVAL_DTOR(fcall_res);
         ZEND_HASH_FOREACH_END();
     } else {
         ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *value)
@@ -589,4 +601,6 @@ PHP_METHOD(vtiful_collection, groupBy)
     }
 
     NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
 }

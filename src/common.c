@@ -212,6 +212,7 @@ void collection_flatten(zend_array *current_collection, zend_long depth, zval *r
             collection_flatten(Z_ARR_P(val), depth - 1, ret_val);
         } else {
             add_next_index_zval(ret_val, val);
+            GC_ZVAL_ADDREF(val);
         }
     ZEND_HASH_FOREACH_END();
 }
@@ -221,6 +222,8 @@ void collection_flip(zend_array *current_collection, zval *ret_val)
     zval args[1];
 
     ZVAL_ARR(&args[0], current_collection);
+
+    GC_ZVAL_ADDREF(&args[0]);
 
     call_internal_function(INTERNAL_FUN(flip), 1, args, ret_val);
 }
