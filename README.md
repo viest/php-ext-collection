@@ -11,7 +11,7 @@
 
 定位于PHP下的ext目录，执行
 ```bash
-git clone https://github.com/VikinDev/v-collect.git
+https://github.com/viest/php-ext-collection
 ```
 
 #### 2、编译安装
@@ -25,14 +25,14 @@ make && make install
 
 #### 3、修改ini
 
-在php.ini文件中加入`extension = vcollect.so`
+在php.ini文件中加入`extension = collection.so`
 
 ## 使用
 
 #### 创建集合
 
 ```php
-$test = vcollect([1, 2, 3, 4, 5, 6]);
+$collection = \Vtiful\Kernel\Collection::init([1]);
 ```
 
 #### Documention
