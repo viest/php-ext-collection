@@ -37,7 +37,7 @@ $collection = \Vtiful\Kernel\Collection::init([1]);
 
 #### Documention
 
-wikin:[https://github.com/VikinDev/v-collect/wiki](https://github.com/VikinDev/v-collect/wiki)
+[wiki](https://github.com/VikinDev/v-collect/wiki)
 
 ## License
 
