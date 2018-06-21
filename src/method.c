@@ -561,6 +561,8 @@ PHP_METHOD(vtiful_collection, get)
 }
 /* }}} */
 
+/** {{{ \Vtiful\Kernel\Collection::groupBy(mixed $key)
+ */
 PHP_METHOD(vtiful_collection, groupBy)
 {
     zval result;
@@ -604,3 +606,87 @@ PHP_METHOD(vtiful_collection, groupBy)
 
     VC_ZVAL_DTOR(result);
 }
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::hash(mixed $key)
+ */
+PHP_METHOD(vtiful_collection, has)
+{
+    zval *key = NULL, *find_res = NULL;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            Z_PARAM_ZVAL(key)
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (Z_TYPE_P(key) == IS_STRING) {
+        COLLECTION_STR_FIND(CURRENT_COLLECTION, Z_STR_P(key), find_res);
+    }
+
+    if (Z_TYPE_P(key) == IS_LONG) {
+        COLLECTION_INDEX_FIND(CURRENT_COLLECTION, Z_LVAL_P(key), find_res);
+    }
+
+    if (find_res == NULL) {
+        ZVAL_FALSE(return_value);
+        return;
+    }
+
+    ZVAL_TRUE(return_value);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::implode(mixed $key, string $str)
+ */
+PHP_METHOD(vtiful_collection, implode)
+{
+    zend_string *key = NULL, *str = NULL, *result = NULL, *z_str_p = NULL;
+    size_t element_char_len = 0, elements_len = 0, new_string_len = 0;
+    zval tmp_zval_array;
+
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+            Z_PARAM_STR(key)
+            Z_PARAM_OPTIONAL
+            Z_PARAM_STR(str)
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT(&tmp_zval_array);
+
+    elements_len = zend_hash_num_elements(CURRENT_COLLECTION);
+
+    if (str == NULL) {
+        ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *val)
+                z_str_p = _zval_get_string_func(val);
+                element_char_len += ZSTR_LEN(z_str_p);
+                add_next_index_str(&tmp_zval_array, z_str_p);
+        ZEND_HASH_FOREACH_END();
+    } else {
+        zval *find_result = NULL;
+
+        ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *val)
+                if (Z_TYPE_P(val) != IS_ARRAY) {
+                    continue;
+                }
+                COLLECTION_STR_FIND(Z_ARR_P(val), key, find_result);
+                z_str_p = _zval_get_string_func(find_result);
+                element_char_len += ZSTR_LEN(z_str_p);
+                add_next_index_str(&tmp_zval_array, z_str_p);
+        ZEND_HASH_FOREACH_END();
+    }
+
+    if (ZEND_NUM_ARGS() < 2) {
+        new_string_len = element_char_len+(ZSTR_LEN(key)*elements_len)-ZSTR_LEN(key);
+        result = zend_string_safe_alloc(elements_len - 1, ZSTR_LEN(key), element_char_len, 0);
+        collection_implode(Z_ARR(tmp_zval_array), key, result);
+        ZSTR_VAL(result)[new_string_len] = '\0';
+    } else {
+        new_string_len = element_char_len+(ZSTR_LEN(str)*elements_len)-ZSTR_LEN(str);
+        result = zend_string_safe_alloc(elements_len - 1, ZSTR_LEN(str), element_char_len, 0);
+        collection_implode(Z_ARR(tmp_zval_array), str, result);
+        ZSTR_VAL(result)[new_string_len] = '\0';
+    }
+
+    ZVAL_STR(return_value, result);
+
+    VC_ZVAL_DTOR(tmp_zval_array);
+}
+/* }}} */

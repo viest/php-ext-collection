@@ -42,5 +42,6 @@ void   collection_flatten(zend_array *current_collection, zend_long depth, zval 
 void   collection_flip(zend_array *current_collection, zval *ret_val);
 void   collection_for_page(zend_array *current_collection, zend_long page, zend_long number, zval *ret_val);
 void   collection_group(zval *foreach_val, zval *tmp, zend_string *group_by_where, zval *group_key, zval *result);
+void   collection_implode(zend_array *current_collection, zend_string *str, zend_string *result);
 
 #endif

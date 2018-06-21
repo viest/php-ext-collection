@@ -61,6 +61,8 @@ PHP_METHOD(vtiful_collection, forget);
 PHP_METHOD(vtiful_collection, forPage);
 PHP_METHOD(vtiful_collection, get);
 PHP_METHOD(vtiful_collection, groupBy);
+PHP_METHOD(vtiful_collection, has);
+PHP_METHOD(vtiful_collection, implode);
 
 // PHP Compatible
 #ifndef GC_ADDREF

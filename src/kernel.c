@@ -96,6 +96,15 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(collection_group_by_arginfo, 0, 0, 1)
                 ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_has_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_implode_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+                ZEND_ARG_INFO(0, str)
+ZEND_END_ARG_INFO()
 /* }}} */
 
 /** {{{ collection_methods
@@ -128,6 +137,8 @@ zend_function_entry collection_methods[] = {
         PHP_ME(vtiful_collection, forPage,       collection_for_page_arginfo,    ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, get,           collection_get_arginfo,         ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, groupBy,       collection_group_by_arginfo,    ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, has,           collection_has_arginfo,         ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, implode,       collection_implode_arginfo,     ZEND_ACC_PUBLIC)
         PHP_FE_END
 };
 /* }}} */
