@@ -63,6 +63,7 @@ PHP_METHOD(vtiful_collection, get);
 PHP_METHOD(vtiful_collection, groupBy);
 PHP_METHOD(vtiful_collection, has);
 PHP_METHOD(vtiful_collection, implode);
+PHP_METHOD(vtiful_collection, intersect);
 
 // PHP Compatible
 #ifndef GC_ADDREF

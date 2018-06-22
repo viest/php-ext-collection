@@ -690,3 +690,59 @@ PHP_METHOD(vtiful_collection, implode)
     VC_ZVAL_DTOR(tmp_zval_array);
 }
 /* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::intersect(array $array)
+ */
+PHP_METHOD(vtiful_collection, intersect)
+{
+    zval *array = NULL, *find_res = NULL;
+    zval total, screening, result;
+    size_t current_length = 0;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            Z_PARAM_ARRAY(array)
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT_IN_CURRENT(&total);
+
+    current_length = CURRENT_COLLECTION_COUNT;
+
+    ZEND_HASH_FOREACH_VAL(Z_ARR_P(array), zval *val)
+        add_index_zval(&total, ++current_length, val);
+        GC_ZVAL_ADDREF(val);
+    ZEND_HASH_FOREACH_END();
+
+    COLLECTION_INIT(&screening);
+    COLLECTION_INIT(&result);
+
+    ZEND_HASH_FOREACH_VAL(Z_ARR(total), zval *val)
+        if (Z_TYPE_P(val) == IS_STRING) {
+            zend_string *tmp = Z_STR_P(val);
+
+            find_res = zend_hash_find(Z_ARR(screening), tmp);
+
+            if (find_res == NULL) {
+                add_assoc_long_ex(&screening, ZSTR_VAL(tmp), ZSTR_LEN(tmp), 1);
+            } else {
+                add_next_index_zval(&result, val);
+            }
+        }
+
+        if (Z_TYPE_P(val) == IS_LONG) {
+            find_res = zend_hash_index_find(Z_ARR(screening), Z_LVAL_P(val));
+
+            if (find_res == NULL) {
+                add_index_long(&screening, Z_LVAL_P(val), 1);
+            } else {
+                add_next_index_zval(&result, val);
+            }
+        }
+    ZEND_HASH_FOREACH_END();
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(screening);
+    VC_ZVAL_DTOR(result);
+    VC_ZVAL_DTOR(total);
+}
+/* }}} */
