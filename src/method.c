@@ -795,3 +795,96 @@ PHP_METHOD(vtiful_collection, isEmpty)
     RETURN_FALSE;
 }
 /* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::isNotEmpty()
+ */
+PHP_METHOD(vtiful_collection, isNotEmpty)
+{
+    if (CURRENT_COLLECTION_COUNT) {
+        RETURN_FALSE;
+    }
+
+    RETURN_TRUE;
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::keyBy(string $key)
+ */
+PHP_METHOD(vtiful_collection, keyBy)
+{
+    zval result;
+
+    zend_string *key = NULL;
+
+    zend_fcall_info       fci       = empty_fcall_info;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            _real_arg++;
+            if (Z_TYPE_P(_real_arg) == IS_STRING) {
+                _real_arg--;
+                Z_PARAM_STR(key);
+            }
+            if (Z_TYPE_P(_real_arg) == IS_OBJECT) {
+                _real_arg--;
+                Z_PARAM_FUNC(fci, fci_cache);
+            }
+    ZEND_PARSE_PARAMETERS_END();
+
+    COLLECTION_INIT(&result);
+
+    if (key) {
+        zval *find_res = NULL;
+
+        ZEND_HASH_FOREACH_VAL(CURRENT_COLLECTION, zval *val)
+            if (Z_TYPE_P(val) != IS_ARRAY)
+                continue;
+            COLLECTION_STR_FIND(Z_ARR_P(val), key, find_res);
+            if (find_res == NULL)
+                continue;
+            if (Z_TYPE_P(find_res) == IS_STRING)
+                add_assoc_zval_ex(&result, Z_STRVAL_P(find_res), Z_STRLEN_P(find_res), val);
+            GC_ZVAL_ADDREF(val);
+        ZEND_HASH_FOREACH_END();
+    } else {
+        zval fcall_res;
+
+        INIT_FCALL(1, &fcall_res);
+
+        ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
+            if (Z_TYPE(bucket->val) != IS_ARRAY)
+                continue;
+            FCALL_ONE_ARGS(bucket);
+            add_assoc_zval_ex(&result, Z_STRVAL(fcall_res), Z_STRLEN(fcall_res), &bucket->val);
+            VC_ZVAL_DTOR(fcall_res);
+            GC_ZVAL_ADDREF(&bucket->val);
+        ZEND_HASH_FOREACH_END();
+    }
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
+}
+/* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::keyBy(string $key)
+ */
+PHP_METHOD(vtiful_collection, keys)
+{
+    zval result;
+
+    COLLECTION_INIT(&result);
+
+    ZEND_HASH_FOREACH_KEY(CURRENT_COLLECTION, zend_ulong long_key, zend_string *str_key)
+        if (str_key) {
+            add_next_index_str(&result, str_key);
+        } else {
+            add_next_index_long(&result, long_key);
+        }
+    ZEND_HASH_FOREACH_END();
+
+    NEW_COLLECTION_OBJ(return_value, &result);
+
+    VC_ZVAL_DTOR(result);
+}
+/* }}} */

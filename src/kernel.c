@@ -113,6 +113,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(collection_intersect_keys_arginfo, 0, 0, 1)
                 ZEND_ARG_INFO(0, array)
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(collection_key_by_arginfo, 0, 0, 1)
+                ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
 /* }}} */
 
 /** {{{ collection_methods
@@ -150,6 +154,9 @@ zend_function_entry collection_methods[] = {
         PHP_ME(vtiful_collection, intersect,       collection_intersect_arginfo,      ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, intersectByKeys, collection_intersect_keys_arginfo, ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, isEmpty,         NULL,                              ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, isNotEmpty,      NULL,                              ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, keyBy,           collection_key_by_arginfo,         ZEND_ACC_PUBLIC)
+        PHP_ME(vtiful_collection, keys,            NULL,                              ZEND_ACC_PUBLIC)
         PHP_FE_END
 };
 /* }}} */
