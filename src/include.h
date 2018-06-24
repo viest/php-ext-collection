@@ -61,6 +61,14 @@ PHP_METHOD(vtiful_collection, forget);
 PHP_METHOD(vtiful_collection, forPage);
 PHP_METHOD(vtiful_collection, get);
 PHP_METHOD(vtiful_collection, groupBy);
+PHP_METHOD(vtiful_collection, has);
+PHP_METHOD(vtiful_collection, implode);
+PHP_METHOD(vtiful_collection, intersect);
+PHP_METHOD(vtiful_collection, intersectByKeys);
+PHP_METHOD(vtiful_collection, isEmpty);
+PHP_METHOD(vtiful_collection, isNotEmpty);
+PHP_METHOD(vtiful_collection, keyBy);
+PHP_METHOD(vtiful_collection, keys);
 
 // PHP Compatible
 #ifndef GC_ADDREF
@@ -96,8 +104,11 @@ PHP_METHOD(vtiful_collection, groupBy);
 #define COLLECTION_ADD_INDEX_ZVAL(collection_zval_p, zval_p) \
         add_next_index_zval(collection_zval_p, zval_p);
 
-#define COLLECTION_DELETE(collection_array_p, zs_key) \
+#define COLLECTION_STRING_DELETE(collection_array_p, zs_key) \
         zend_hash_del(collection_array_p, zs_key);
+
+#define COLLECTION_INDEX_DELETE(collection_array_p, ulong_key) \
+        zend_hash_index_del(collection_array_p, ulong_key);
 
 #define COLLECTION_INIT_IN_CURRENT(zval_p) \
         COLLECTION_INIT(zval_p);           \

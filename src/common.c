@@ -267,6 +267,23 @@ void collection_group(zval *foreach_val, zval *tmp, zend_string *group_by_where,
     }
 }
 
+void collection_implode(zend_array *current_collection, zend_string *str, zend_string *result)
+{
+    char *c_char_p       = NULL;
+    zend_string *z_str_p = NULL;
+
+    c_char_p  = ZSTR_VAL(result);
+    *c_char_p = 0;
+
+    ZEND_HASH_FOREACH_VAL(current_collection, zval *val)
+        z_str_p = Z_STR_P(val);
+        memcpy(c_char_p, ZSTR_VAL(z_str_p), ZSTR_LEN(z_str_p));
+        c_char_p += ZSTR_LEN(z_str_p);
+        memcpy(c_char_p, ZSTR_VAL(str), ZSTR_LEN(str));
+        c_char_p += ZSTR_LEN(str);
+    ZEND_HASH_FOREACH_END();
+}
+
 int zval_comparison_operations(zend_string *operator, zval *left, zval *right)
 {
     if (strcmp(operator->val, "==") == 0) {

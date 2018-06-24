@@ -1,0 +1,26 @@
+language: php
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+notifications:
+  email: dev@service.viest.me
+
+before_script:
+  - phpize && ./configure && make clean && make
+
+branches:
+  only:
+    - master
+    - refactoring
+script:
+    - ./travis/run-test.sh
