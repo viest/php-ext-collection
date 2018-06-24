@@ -1,6 +1,10 @@
-![](https://github.com/VikinDev/v-collect/blob/master/image/cover.jpg)
+<p align="center">
+<img src="https://github.com/viest/php-ext-collection/blob/master/image/cover.jpg" height="300"/>
+</p
 
-[![Build Status](https://travis-ci.org/viest/php-ext-collection.svg?branch=master)](https://travis-ci.org/viest/php-ext-collection)
+<p align="center">
+<a href="https://travis-ci.org/viest/php-ext-collection"><img src="https://travis-ci.org/viest/php-ext-collection.svg?branch=master" alt="Build Status"></a>
+</p>
 
 ## 介绍：
 `vcollect` 是一个PHP c extension，提供流畅、便利的数组数据操作。
