@@ -867,7 +867,7 @@ PHP_METHOD(vtiful_collection, keyBy)
 }
 /* }}} */
 
-/** {{{ \Vtiful\Kernel\Collection::keyBy(string $key)
+/** {{{ \Vtiful\Kernel\Collection::keys()
  */
 PHP_METHOD(vtiful_collection, keys)
 {
