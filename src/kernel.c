@@ -123,7 +123,7 @@ ZEND_END_ARG_INFO()
 */
 zend_function_entry collection_methods[] = {
         PHP_ME(vtiful_collection, __construct,     NULL,                              ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
-        PHP_ME(vtiful_collection, __clone,         NULL,                              ZEND_ACC_PRIVATE|ZEND_ACC_CLONE)
+        PHP_ME(vtiful_collection, __clone,         NULL,                              ZEND_ACC_PRIVATE|ZEND_ACC_FINAL)
         PHP_ME(vtiful_collection, init,            collection_init_arginfo,           ZEND_ACC_PUBLIC |ZEND_ACC_STATIC)
         PHP_ME(vtiful_collection, map,             collection_map_arginfo,            ZEND_ACC_PUBLIC)
         PHP_ME(vtiful_collection, all,             NULL,                              ZEND_ACC_PUBLIC)
