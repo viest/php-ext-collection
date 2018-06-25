@@ -888,3 +888,30 @@ PHP_METHOD(vtiful_collection, keys)
     VC_ZVAL_DTOR(result);
 }
 /* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::last([callback $callback])
+ */
+PHP_METHOD(vtiful_collection, last)
+{
+    zend_fcall_info       fci       = empty_fcall_info;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+
+    ZEND_PARSE_PARAMETERS_START(0, 1)
+            Z_PARAM_OPTIONAL
+            Z_PARAM_FUNC(fci, fci_cache);
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (fci.size) {
+        zval fcall_res;
+        INIT_FCALL(2, &fcall_res);
+        ZEND_HASH_FOREACH_BUCKET(CURRENT_COLLECTION, Bucket *bucket)
+            FCALL_TWO_ARGS(bucket);
+            if (Z_TYPE(fcall_res) == IS_TRUE)
+                ZVAL_COPY(return_value, &bucket->val);
+        ZEND_HASH_FOREACH_END();
+    } else {
+        zval *find_res;
+        COLLECTION_INDEX_FIND(CURRENT_COLLECTION, CURRENT_COLLECTION_COUNT-1, find_res);
+        ZVAL_COPY(return_value, find_res);
+    }
+}

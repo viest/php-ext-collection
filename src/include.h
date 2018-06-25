@@ -69,6 +69,7 @@ PHP_METHOD(vtiful_collection, isEmpty);
 PHP_METHOD(vtiful_collection, isNotEmpty);
 PHP_METHOD(vtiful_collection, keyBy);
 PHP_METHOD(vtiful_collection, keys);
+PHP_METHOD(vtiful_collection, last);
 
 // PHP Compatible
 #ifndef GC_ADDREF
