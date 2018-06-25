@@ -70,6 +70,7 @@ PHP_METHOD(vtiful_collection, isNotEmpty);
 PHP_METHOD(vtiful_collection, keyBy);
 PHP_METHOD(vtiful_collection, keys);
 PHP_METHOD(vtiful_collection, last);
+PHP_METHOD(vtiful_collection, mapToGroups);
 
 // PHP Compatible
 #ifndef GC_ADDREF
@@ -97,10 +98,19 @@ PHP_METHOD(vtiful_collection, last);
 #define ZVAL_ARRAY_COUNT(zval_p) \
         Z_ARR_P(zval_p)->nNumOfElements
 
+#define COLLECTION_INDEX_ZVAL(zval_p, index) \
+        &Z_ARR_P(zval_p)->arData[index].val
+
 #define COLLECTION_INIT(zval_p) \
         do {                    \
             array_init(zval_p); \
         } while (0)
+
+#define COLLECTION_TMP(zval_p)       \
+        zval collection_tmp;         \
+        zval_p = &collection_tmp;    \
+        array_init(&collection_tmp);
+
 
 #define COLLECTION_ADD_INDEX_ZVAL(collection_zval_p, zval_p) \
         add_next_index_zval(collection_zval_p, zval_p);
@@ -173,10 +183,8 @@ PHP_METHOD(vtiful_collection, last);
 
 #define COLLECTION_INDEX_FIND(collection, index, zval_result_p)   \
         do {                                                      \
-            if (index < CURRENT_COLLECTION->nNumOfElements) {     \
+            if (index < collection->nNumOfElements) {             \
                 zval_result_p = &(collection->arData[index].val); \
-            } else {                                              \
-                ZVAL_NULL(zval_result_p);                         \
             }                                                     \
         } while (0)
 
