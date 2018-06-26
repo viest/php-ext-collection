@@ -951,8 +951,6 @@ PHP_METHOD(vtiful_collection, mapToGroups)
             zend_hash_next_index_insert(Z_ARR_P(find_res), new_val);
             zend_hash_add(Z_ARR(result), str_key, find_res);
             zend_string_release(str_key);
-            GC_ZVAL_ADDREF(new_val);
-            VC_ZVAL_DTOR(fcall_res);
         } else {
             COLLECTION_INDEX_FIND(Z_ARR(result), long_key, find_res);
             if (find_res == NULL) {
@@ -961,9 +959,9 @@ PHP_METHOD(vtiful_collection, mapToGroups)
             new_val = COLLECTION_INDEX_ZVAL(&fcall_res, long_key);
             zend_hash_next_index_insert(Z_ARR_P(find_res), new_val);
             zend_hash_index_add(Z_ARR(result), long_key, find_res);
-            GC_ZVAL_ADDREF(new_val);
-            VC_ZVAL_DTOR(fcall_res);
         }
+        GC_ZVAL_ADDREF(new_val);
+        VC_ZVAL_DTOR(fcall_res);
     ZEND_HASH_FOREACH_END();
 
     NEW_COLLECTION_OBJ(return_value, &result);
