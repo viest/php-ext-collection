@@ -90,13 +90,13 @@ PHP_METHOD(vtiful_collection, mapToGroups);
 
 // Define
 #define CURRENT_COLLECTION \
-        Z_OBJ_P(getThis())->properties
+        Z_OBJ_HT_P(getThis())->get_properties(getThis())
 
 #define CURRENT_COLLECTION_COUNT \
-        CURRENT_COLLECTION->nNumOfElements
+        zend_hash_num_elements(CURRENT_COLLECTION)
 
 #define ZVAL_ARRAY_COUNT(zval_p) \
-        Z_ARR_P(zval_p)->nNumOfElements
+        zend_hash_num_elements(Z_ARR_P(zval_p))
 
 #define COLLECTION_INDEX_ZVAL(zval_p, index) \
         &Z_ARR_P(zval_p)->arData[index].val
