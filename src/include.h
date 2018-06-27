@@ -71,6 +71,7 @@ PHP_METHOD(vtiful_collection, keyBy);
 PHP_METHOD(vtiful_collection, keys);
 PHP_METHOD(vtiful_collection, last);
 PHP_METHOD(vtiful_collection, mapToGroups);
+PHP_METHOD(vtiful_collection, max);
 
 // PHP Compatible
 #ifndef GC_ADDREF

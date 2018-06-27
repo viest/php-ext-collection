@@ -17,4 +17,4 @@ $grouped = $collection->mapToGroups(function ($item, $key) {
     return [$item['department'] => $item['name']];
 });
 
-var_dump($grouped);
+var_dump($grouped->toArray());

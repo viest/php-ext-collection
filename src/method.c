@@ -968,3 +968,25 @@ PHP_METHOD(vtiful_collection, mapToGroups)
     VC_ZVAL_DTOR(result);
 }
 /* }}} */
+
+/** {{{ \Vtiful\Kernel\Collection::max([string $key])
+ */
+PHP_METHOD(vtiful_collection, max)
+{
+    zval *result = NULL;
+    zend_string *key = NULL;
+
+    ZEND_PARSE_PARAMETERS_START(0, 1)
+            Z_PARAM_OPTIONAL
+            Z_PARAM_STR(key);
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (ZEND_NUM_ARGS() < 1) {
+        result = zend_hash_minmax(CURRENT_COLLECTION, collection_compare, 1);
+    } else {
+        result = zend_hash_key_minmax(CURRENT_COLLECTION, key, collection_compare_by_key, 1);
+    }
+
+    ZVAL_COPY(return_value, result);
+}
+/* }}} */

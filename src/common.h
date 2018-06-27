@@ -22,7 +22,11 @@
 #define INTERNAL_ARR    "array_"
 #define INTERNAL_FUN(m) INTERNAL_ARR#m
 
+typedef int  (*compare_key_func_t)(const void *, const void *, const void *);
+
 void call_internal_function(const char *function_name, uint32_t param_count, zval params[], zval *ret_val);
+
+zval* ZEND_FASTCALL zend_hash_key_minmax(const HashTable *ht, const zend_string *key, compare_key_func_t compar, uint32_t flag);
 
 int zval_equal(zval *z1, zval *z2);
 int zval_comparison_operations(zend_string *operator, zval *left, zval *right);
@@ -43,5 +47,7 @@ void   collection_flip(zend_array *current_collection, zval *ret_val);
 void   collection_for_page(zend_array *current_collection, zend_long page, zend_long number, zval *ret_val);
 void   collection_group(zval *foreach_val, zval *tmp, zend_string *group_by_where, zval *group_key, zval *result);
 void   collection_implode(zend_array *current_collection, zend_string *str, zend_string *result);
+int    collection_compare(const void *a, const void *b);
+int    collection_compare_by_key(const void *a, const void *b, const void *key);
 
 #endif

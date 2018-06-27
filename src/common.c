@@ -284,6 +284,102 @@ void collection_implode(zend_array *current_collection, zend_string *str, zend_s
     ZEND_HASH_FOREACH_END();
 }
 
+int collection_compare(const void *a, const void *b)
+{
+    zval result;
+    zval *first = NULL, *second = NULL;
+
+    first  = &((Bucket *)a)->val;
+    second = &((Bucket *)b)->val;
+
+    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT)) {
+        first = Z_INDIRECT_P(first);
+    }
+    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
+        second = Z_INDIRECT_P(second);
+    }
+    if (compare_function(&result, first, second) == FAILURE) {
+        return 0;
+    }
+
+    ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
+    return ZEND_NORMALIZE_BOOL(Z_LVAL(result));
+}
+
+int collection_compare_by_key(const void *a, const void *b, const void *key)
+{
+    zval result;
+    zval *first_arr = NULL, *second_arr = NULL, *first = NULL, *second = NULL;
+
+    first_arr  = &((Bucket *)a)->val;
+    second_arr = &((Bucket *)b)->val;
+
+    if (Z_TYPE_P(first_arr) == IS_ARRAY) {
+        first = zend_hash_find(Z_ARR_P(first_arr), (zend_string *)key);
+    } else {
+        first = first_arr;
+    }
+
+    if (Z_TYPE_P(second_arr) == IS_ARRAY) {
+        second = zend_hash_find(Z_ARR_P(second_arr), (zend_string *)key);
+    } else {
+        second = second_arr;
+    }
+
+    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT)) {
+        first = Z_INDIRECT_P(first);
+    }
+    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
+        second = Z_INDIRECT_P(second);
+    }
+    if (compare_function(&result, first, second) == FAILURE) {
+        return 0;
+    }
+
+    ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
+    return ZEND_NORMALIZE_BOOL(Z_LVAL(result));
+}
+
+zval* ZEND_FASTCALL zend_hash_key_minmax(const HashTable *ht, const zend_string *key, compare_key_func_t compar, uint32_t flag)
+{
+    uint32_t idx;
+    Bucket *p, *res;
+
+    if (ht->nNumOfElements == 0 ) {
+        return NULL;
+    }
+
+    idx = 0;
+    while (1) {
+        if (idx == ht->nNumUsed) {
+            return NULL;
+        }
+        if (Z_TYPE(ht->arData[idx].val) != IS_UNDEF) break;
+        idx++;
+    }
+    res = ht->arData + idx;
+    for (; idx < ht->nNumUsed; idx++) {
+        p = ht->arData + idx;
+        if (UNEXPECTED(Z_TYPE(p->val) == IS_UNDEF)) continue;
+
+        if (flag) {
+            if (compar(res, p, key) < 0) { /* max */
+                res = p;
+            }
+        } else {
+            if (compar(res, p, key) > 0) { /* min */
+                res = p;
+            }
+        }
+    }
+
+    if (Z_TYPE_P(&res->val) == IS_ARRAY) {
+        return zend_hash_str_find_ind(Z_ARR(res->val), ZSTR_VAL(key), ZSTR_LEN(key));
+    } else {
+        return &res->val;
+    }
+}
+
 int zval_comparison_operations(zend_string *operator, zval *left, zval *right)
 {
     if (strcmp(operator->val, "==") == 0) {
